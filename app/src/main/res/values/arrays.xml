@@ -1,0 +1,31 @@
+<resources>
+    <string-array name="listArray">
+        <item>Headings</item>
+        <item>Headings and Details</item>
+        <item>All Data</item>
+    </string-array>
+
+    <string-array name="listValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="time_setting_vals">
+        <item>15000</item>
+        <item>30000</item>
+        <item>45000</item>
+        <item>60000</item>
+        <item>120000</item>
+        <item>360000</item>
+    </string-array>
+    <string-array name="time_settings">
+        <item>15 sec</item>
+        <item>30 sec</item>
+        <item>45 sec</item>
+        <item>1 min</item>
+        <item>2 min</item>
+        <item>3 min</item>
+    </string-array>
+
+</resources>
