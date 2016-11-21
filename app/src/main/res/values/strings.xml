@@ -1,0 +1,78 @@
+<resources>
+    <string name="app_name">SignalRocket</string>
+    <string name="title_activity_maps">SignalRocket</string>
+    <string name="title_activity_app_preferences">Settings</string>
+    <string name="intro_activity_title">SignalRocket</string>
+    <string name="preferences_label">Settings</string>
+    <string name="group_types">Manage Groups</string>
+    <string name="stop_tracking">Stop Tracking</string>
+    <string name="main_activity">Home</string>
+    <string name="startup_banner">Welcome to SignalRocket!</string>
+    <string name="sales_pitch">Welcome to SignalRocket, the app that lets you locate your family and
+    friends.  Best of all, it requires no personal info, just a screen name for you and a group name
+    for your team members.  Let\'s get started!</string>
+    <string name="screen_name">Your screen name:</string>
+    <string name="group_name">Name your group:</string>
+    <string name="lets_go">Let\'s go!</string>
+    <string name="change_username_title">Change your username</string>
+    <string name="change_username_text">Change your name as it appears in your main group</string>
+    <string name="manage_groups_and_members_title">Change your groups and members</string>
+    <string name="manage_groups_and_members_text">Add and drop groups and members, or change group names or member names</string>
+    <string name="tracking_interval_default">400</string>
+    <string name="select_tracking_interval_units">Tracking Interval</string>
+    <string name="settings_title">Settings</string>
+    <string-array name="intervals">
+        <item>10</item>
+        <item>25</item>
+        <item>50</item>
+        <item>100</item>
+        <item>200</item>
+        <item>400</item>
+    </string-array>
+    <string name="action_settings">Settings</string>
+    <string-array name="mapviews_vals">
+        <item>2</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="mapviews">
+        <item>Satellite View</item>
+        <item>Standard View</item>
+    </string-array>
+    <string name="map_type_default">Standard View</string>
+    <string name="select_map_type">Select Map View</string>
+    <string name="group_i_own">Groups I Own</string>
+    <string name="group_i_administer">Groups I\'m In</string>
+    <string name="group_i_own_title">Groups I Own</string>
+    <string name="group_i_administer_title">Groups I\'m In</string>
+    <string name="distance_interval_default">250</string>
+    <string name="distance_interval">Distance Intervals (m)</string>
+    <string name="select_distance_interval">Select Distance Interval (m)</string>
+    <string-array name="distance_settings">
+        <item>10</item>
+        <item>50</item>
+        <item>100</item>
+        <item>250</item>
+        <item>500</item>
+        <item>1000</item>
+    </string-array>
+    <string name="time_interval_default">30000</string>
+    <string name="select_time_interval">Select Time Interval (s)</string>
+    <string name="time_interval">Time Intervals (s)</string>
+    <string-array name="time_settings">
+        <item>15000</item>
+        <item>30000</item>
+        <item>45000</item>
+        <item>60000</item>
+        <item>120000</item>
+        <item>360000</item>
+    </string-array>
+    <string-array name="time_setting_vals">
+        <item>15 sec</item>
+        <item>30 sec</item>
+        <item>45 sec</item>
+        <item>1 min</item>
+        <item>2 min</item>
+        <item>3 min</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<preference-headers
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <header
+        android:fragment="com.gammazero.signalrocket.AppPreferencesFragment"
+        android:title="Change Preferences"
+        android:summary="Change your screen name, switch between satellite maps or street view, etc."/>
+    <header
+        android:fragment="com.gammazero.signalrocket.AppPreferencesFragment$Prefs1Fragment"
+        android:title="Change Location Intervals"
+        android:summary="Change the time or distance between location records."/>
+
+</preference-headers>

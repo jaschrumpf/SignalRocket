@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <ListPreference
+        android:key="myTimeInterval"
+        android:entries="@array/time_settings"
+        android:entryValues="@array/time_setting_vals" />
+
+    <ListPreference
+        android:defaultValue="@string/distance_interval_default"
+        android:title="@string/select_distance_interval"
+        android:key="myDistanceInterval"
+        android:entries="@array/distance_settings"
+        android:entryValues="@array/distance_settings"/>
+</PreferenceScreen>

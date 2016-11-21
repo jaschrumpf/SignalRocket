@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <EditTextPreference
+        android:title="Change User Name"
+        android:key="myUserName"
+        android:id="@+id/new_user_name"
+        android:layout_width="match_parent" >
+
+    </EditTextPreference>
+
+<ListPreference
+android:defaultValue="@string/map_type_default"
+android:title="@string/select_map_type"
+    android:id="@+id/new_map_type"
+android:key="map_type"
+android:entries="@array/mapviews"
+android:entryValues="@array/mapviews_vals" />
+
+    </PreferenceScreen>
+
