@@ -21,21 +21,5 @@
         android:layout_weight="0.97">
     </ListView>
 
-    <Button
-        android:text="Create Group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/button2"
-        android:clickable="true"
-        android:onClick="createNewGroup"/>
-
-    <Button
-        android:text="Delete Group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/button3"
-        android:clickable="true"
-        android:onClick="deleteGroup"/>
-
 
 </LinearLayout>

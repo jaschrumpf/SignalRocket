@@ -30,15 +30,7 @@
         <item>400</item>
     </string-array>
     <string name="action_settings">Settings</string>
-    <string-array name="mapviews_vals">
-        <item>2</item>
-        <item>1</item>
-    </string-array>
-    <string-array name="mapviews">
-        <item>Satellite View</item>
-        <item>Standard View</item>
-    </string-array>
-    <string name="map_type_default">Standard View</string>
+    <string name="map_type_default">MAP_TYPE_NORMAL</string>
     <string name="select_map_type">Select Map View</string>
     <string name="group_i_own">Groups I Own</string>
     <string name="group_i_administer">Groups I\'m In</string>
@@ -58,5 +50,6 @@
     <string name="time_interval_default">30000</string>
     <string name="select_time_interval">Select Time Interval (s)</string>
     <string name="time_interval">Time Intervals (s)</string>
+    <string name="invitation_activity">Invite someone to join your group</string>
 
 </resources>

@@ -1,0 +1,57 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/invite_activity_tv1"
+        android:text="Phone Number : "
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/mobileNumber"
+        android:layout_below="@id/invite_activity_tv1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter phone number"
+        android:inputType="phone" >
+    </EditText>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_marginTop="142dp"
+        android:layout_height="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/invite_activity_tv2"
+        android:layout_below="@id/mobileNumber"
+        android:layout_height="wrap_content"
+        android:text="Message: "/>
+
+    <EditText
+        android:id="@+id/smsBody"
+        android:layout_below="@id/invite_activity_tv2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:hint="Enter message body"
+        android:inputType="textMultiLine"
+        android:lines="7" />
+
+    <Button
+       android:id="@+id/send"
+       android:layout_marginTop="45dp"
+       android:layout_width="200dp"
+       android:layout_height="wrap_content"
+       android:layout_weight="5"
+       android:text="Send"
+        android:layout_below="@+id/smsBody"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

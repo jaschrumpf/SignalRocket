@@ -43,10 +43,10 @@
         android:layout_width="295dp"
         android:layout_height="wrap_content"
         android:key="my_user_name"
-        android:inputType="textPersonName"
         android:ems="10"
         android:id="@+id/my_user_name"
         android:layout_gravity="center_horizontal"
+        android:inputType="textCapSentences"
         android:layout_weight="0.03" />
 
     <TextView
@@ -69,6 +69,7 @@
         android:key="my_group_name"
         android:id="@+id/my_group_name"
         android:layout_gravity="center_horizontal"
+        android:inputType="textCapSentences"
         android:layout_weight="0.03"/>
 
     <TextView

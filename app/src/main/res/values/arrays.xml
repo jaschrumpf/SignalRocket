@@ -5,6 +5,15 @@
         <item>All Data</item>
     </string-array>
 
+    <string-array name="mapviews_vals">
+        <item>MAP_TYPE_SATELLITE</item>
+        <item>MAP_TYPE_NORMAL</item>
+    </string-array>
+    <string-array name="mapviews">
+        <item>Satellite View</item>
+        <item>Standard View</item>
+    </string-array>
+
     <string-array name="listValues">
         <item>1</item>
         <item>2</item>

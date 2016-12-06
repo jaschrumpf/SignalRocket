@@ -56,6 +56,8 @@ public class UserAdminActivity extends Activity{
             ContactsContract.Data.DISPLAY_NAME + " != '' ))";
 
     SharedPreferences appPrefs;
+    SharedPreferences.Editor prefsEditor;
+
     String myUserID;
     String myUserName;
     String myGroupID;
@@ -64,6 +66,7 @@ public class UserAdminActivity extends Activity{
     ListView listView;
     String[] values;
     String[] group_ids;
+    String[] member_ids;
     String groupID = "";
     String group_type = "";
     Float zoomLevel;
@@ -75,7 +78,11 @@ public class UserAdminActivity extends Activity{
     @Override
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "Starting UserAdminActivity");
         Bundle extras = getIntent().getExtras();
+        appPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefsEditor = appPrefs.edit();
+
         String group_name = extras.getString("GROUP_NAME");
         zoomLevel = extras.getFloat("ZOOMLEVEL");
         dlatitude = extras.getDouble("LATITUDE");
@@ -88,11 +95,7 @@ public class UserAdminActivity extends Activity{
             setContentView(R.layout.user_activity_member);
 
         }
-        appPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         String group_url = "";
-        // SharedPreferences.Editor prefsEditor = appPrefs.edit();
-        myUserID = appPrefs.getString("myUserID", null);
-        appPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         myUserName = appPrefs.getString("myUserName", "");
         myUserID = appPrefs.getString("myUserID", "");
         myGroupName = appPrefs.getString("myGroupName", "");
@@ -200,17 +203,17 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
                 GoHome();
             }
             values = new String[lengthJsonArr];
-            group_ids = new String[lengthJsonArr];
+            member_ids = new String[lengthJsonArr];
             JSONObject jObject = null;
 
             for (int i = 0; i < lengthJsonArr; i++) {
                 /****** Get Object for each JSON node.***********/
                 try {
                     jObject = jArray.getJSONObject(i);
-                    String group_name = jObject.getString("name");
-                    String group_id = jObject.getString("id");
-                    values[i] = group_name;
-                    group_ids[i] = group_id;
+                    String member_name = jObject.getString("name");
+                    String member_id = jObject.getString("id");
+                    values[i] = member_name;
+                    member_ids[i] = member_id;
 
 
                 } catch (NullPointerException npe) {
@@ -225,7 +228,8 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
 
             }
             listView = (ListView) findViewById(R.id.user_list);
-            ArrayAdapter adapter = new ArrayAdapter<String>(UserAdminActivity.this, R.layout.user_activity_listview, values);
+         //   ArrayAdapter adapter = new ArrayAdapter<String>(UserAdminActivity.this, R.layout.user_activity_listview, values);
+            ArrayAdapter adapter = new ArrayAdapter<String>(getApplication(), R.layout.user_activity_listview, values);
             listView.setAdapter(adapter);
 
 
@@ -254,9 +258,9 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
                     final String itemValue = (String) listView.getItemAtPosition(position);
 
                     // Show Alert
-                    Toast.makeText(getApplicationContext(),
-                            "Position :" + itemPosition + "  Group Name : " + itemValue + "  Group ID : " + group_ids[itemPosition], Toast.LENGTH_LONG)
-                            .show();
+                   // Toast.makeText(getApplicationContext(),
+                     //       "Position :" + itemPosition + "  Group Name : " + itemValue + "  Group ID : " + group_ids[itemPosition], Toast.LENGTH_LONG)
+                     //       .show();
 
                     // new GetMembersTask().execute(group_ids[itemPosition]);
 
