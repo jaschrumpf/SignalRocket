@@ -1,11 +1,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.gammazero.signalrocket.MapsActivity" >
 
     <item
-        android:id="@+id/list_group"
-        android:title="List members" />
-    <item
-        android:id="@+id/make_active_group"
-        android:title="Make Active Group" />
+        android:id="@+id/move_focus"
+        android:title="Move focus to this member" />
 </menu>

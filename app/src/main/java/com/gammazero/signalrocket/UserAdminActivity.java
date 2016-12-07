@@ -283,19 +283,4 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
 
 }
 
-    public void onCheckboxClicked(View view) {
-        // Is the view now checked?
-        boolean checked = ((CheckBox) view).isChecked();
-        long[] checkedItemPos = listView.getCheckedItemIds();
-
-        // Check which checkbox was clicked
-        switch(view.getId()) {
-            case R.id.user_label2:
-                if (checked)
-                Toast.makeText(getApplicationContext(), "checkbox checked at position" + String.valueOf(checkedItemPos[0]),Toast.LENGTH_LONG).show();
-                else
-                // Remove the meat
-                break;
-        }
-    }
 }

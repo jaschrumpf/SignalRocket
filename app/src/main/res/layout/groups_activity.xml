@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,35 +7,48 @@
     android:weightSum="1">
 
     <TextView
-        android:text="Tap group name to select"
+        android:text="Tap group name to select.\nLong press to bring up options menu."
         android:textSize="16sp"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_marginTop="30px"
+        android:layout_marginLeft="5px"
+        android:layout_height="50dp"
         android:id="@+id/textView5" />
 
     <ListView
         android:id="@+id/mobile_list"
+        android:layout_below="@id/textView5"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:textSize="30sp"
-        android:layout_weight="0.97">
+        android:layout_height="300dp"
+        android:textSize="24sp"
+        android:layout_weight="0.97"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
     </ListView>
 
-    <Button
-        android:text="Create Group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/button2"
-        android:clickable="true"
-        android:onClick="createNewGroup"/>
 
     <Button
         android:text="Delete Group"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:id="@+id/button3"
         android:clickable="true"
-        android:onClick="deleteGroup"/>
+        android:onClick="deleteGroup"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp" />
+
+    <Button
+        android:text="Create Group"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/button2"
+        android:clickable="true"
+        android:onClick="createNewGroup"
+        android:layout_above="@+id/button3"
+        android:layout_alignLeft="@+id/button3"
+        android:layout_alignStart="@+id/button3"
+        android:layout_marginBottom="10dp" />
 
 
-</LinearLayout>
+</RelativeLayout>

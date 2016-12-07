@@ -35,8 +35,13 @@
         </menu>
     </item>
     <item
-        android:id="@+id/main_activity"
+        android:id="@+id/show_all"
         android:orderInCategory="115"
+        android:title="Show All"/>
+
+    <item
+        android:id="@+id/main_activity"
+        android:orderInCategory="120"
         android:title="@string/main_activity"/>
 
 </menu>

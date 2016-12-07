@@ -26,8 +26,10 @@ import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -59,6 +61,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -160,6 +163,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         Log.d(TAG, "Starting MapsActivity");
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             zoomLevel = extras.getFloat("ZOOMLEVEL");
@@ -198,7 +202,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         myTimeInt = appPrefs.getString("myTimeInterval", "100");
         locTimeInterval = Integer.valueOf(myTimeInt);
         locDistanceInterval = Integer.valueOf(myDistInt);
-        zoomLevel = appPrefs.getFloat("zoomLevel", 13.0f);
+        try {
+            String zLevel = appPrefs.getString("zoomLevel", "13");
+            zoomLevel = Float.parseFloat(zLevel);
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
+        }
         dlatitude = Double.parseDouble(appPrefs.getString("dlatitude", "38.9"));
         dlongitude = Double.parseDouble(appPrefs.getString("dlongitde", "-77.0"));
 
@@ -223,6 +232,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+
+                MenuInflater inflater = getMenuInflater();
+                inflater.inflate(R.menu.marker_info_window_menu, menu);
+            }
+        });
+
+
         Log.d(TAG, "Entering onMapReady");
        // Toast.makeText(this, "Entering onMapReady", Toast.LENGTH_SHORT).show();
 
@@ -405,6 +425,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 acceptIntent.putExtra("LATITUDE", dlatitude);
                 acceptIntent.putExtra("LONGITUDE", dlongitude);
                 startActivity(acceptIntent);
+                return true;
+
+            case R.id.show_all:
+                appPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+                String maxDistance = appPrefs.getString("maxDistance", "9.0");
+                zoomLevel = getZoomLevel(maxDistance);
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(zoomLevel));
                 return true;
 
             case R.id.main_activity:
@@ -598,6 +625,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         protected void onPostExecute (String myResult) {
 
             IconGenerator iconFactory = new IconGenerator(context);
+            Double maxDistance = 0.0;
             //  mClusterManager = new ClusterManager<MyItem>(context, mMap);
 
                 //parse JSON data
@@ -618,7 +646,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Double memberDlat = Double.parseDouble(memberLat);
                         String memberLng = jObject.getString("longitude");
                         Double memberDlng = Double.parseDouble(memberLng);
-                        String memberDist = jObject.getString("distance");
+                        Double memberDdist = jObject.getDouble("distance");
+                        DecimalFormat df = new DecimalFormat("#.##");
+                        DecimalFormat df1 = new DecimalFormat("#.#");
+                        memberLat = df.format(memberDlat);
+                        memberLng = df.format(memberDlng);
+                        String memberDist = df1.format(memberDdist);
+                        String snippet = "(" + memberLat + ", " + memberLng + ")";
+                        String text = memberDist + " mi.";
+                        if (Double.parseDouble(memberDist) > maxDistance) {
+                            maxDistance = Double.parseDouble(memberDist);
+                        }
                         String message_text = "";
                         try {
                             message_text = jObject.getString("message_text");
@@ -633,6 +671,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                         LatLng memberLatLng = new LatLng(memberDlat, memberDlng);
                         int timeDiff = jObject.getInt("timediff");
+                        // get absolute value in a really cheap and dirty way
+                        if (timeDiff < 0) {
+                            timeDiff = timeDiff * -1;
+                        }
                         // set colors for markers depending on how stale the record is
                         if (timeDiff > 1 && timeDiff < 5) {
                             iconFactory.setColor(Color.YELLOW);
@@ -643,7 +685,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             }
                         }
 
-                        groupMarkers[i] = addIcon(iconFactory, memberName, memberLatLng);
+                        groupMarkers[i] = addIcon(iconFactory, memberName, memberLatLng, snippet, text);
                         //MyItem offsetItem = new MyItem(memberDlat, memberDlng);
                         //mClusterManager.addItem(offsetItem);
 
@@ -655,15 +697,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     } // End Loop
 //                startActivity(mapsActivityIntent);
 
+
+
+                    appPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    prefsEditor = appPrefs.edit();
+                    prefsEditor.putString("zoomLevel", Float.toString(zoomLevel));
+                    prefsEditor.commit();
+
+                    //Toast.makeText(getApplicationContext(), "Max distance = " + maxDistance, Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     Log.e("JSONException", "Error: " + e.toString());
                 }
             }
     }
 
-    private Marker addIcon(IconGenerator iconFactory, CharSequence text, LatLng position) {
+    private Marker addIcon(IconGenerator iconFactory, CharSequence message_text, LatLng position, String snippet, String text) {
         MarkerOptions markerOptions = new MarkerOptions().
-                icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(text))).
+                icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(message_text))).
+                title(text).
+                snippet(snippet).
                 position(position).
                 anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
 
@@ -813,9 +865,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     } catch (SecurityException se) {
                         Log.d(TAG, "Unable to update location manager");
                     }
-
-
         }
+    private float getZoomLevel (String distance) {
+
+        Double maxDistance = Double.parseDouble(distance);
+        if (maxDistance > 3360.0) {
+            zoomLevel = 1.0f;
+        } else if (maxDistance > 1280.0) {
+            zoomLevel = 2.0f;
+        } else if (maxDistance > 640.0) {
+            zoomLevel = 3.0f;
+        } else if (maxDistance > 320.0) {
+            zoomLevel = 4.0f;
+        } else if (maxDistance > 160.0) {
+            zoomLevel = 5.0f;
+        } else if (maxDistance > 80.0) {
+            zoomLevel = 6.0f;
+        } else if (maxDistance > 40.0) {
+            zoomLevel = 7.0f;
+        } else if (maxDistance > 20.0) {
+            zoomLevel = 8.0f;
+        } else if (maxDistance > 10.0) {
+            zoomLevel = 9.0f;
+        } else if (maxDistance > 5.0) {
+            zoomLevel = 10.0f;
+        } else if (maxDistance > 2.5) {
+            zoomLevel = 13.0f;
+        } else if (maxDistance > 1.25) {
+            zoomLevel = 14.0f;
+        }
+        return zoomLevel;
+    }
 
 }
 

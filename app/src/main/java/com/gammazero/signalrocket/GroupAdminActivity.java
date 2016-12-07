@@ -333,17 +333,16 @@ public class GroupAdminActivity extends Activity {
                 if (! prefsEditor.commit()) {
                     Toast.makeText(context, "Preference save failed", Toast.LENGTH_LONG).show();
                 }
+                Intent mainIntent = new Intent(getBaseContext(), MapsActivity.class);
+                extras = getIntent().getExtras();
+                mainIntent.putExtra("ZOOMLEVEL", extras.getFloat("ZOOMLEVEL"));
+                mainIntent.putExtra("LATITUDE", extras.getDouble("LATITUDE"));
+                mainIntent.putExtra("LONGITUDE", extras.getDouble("LONGITUDE"));
+                startActivity(mainIntent);
+
+                }
                 return true;
-            case R.id.delete_group:
-                Toast.makeText(this, "delete info.id = " + groupName, Toast.LENGTH_SHORT).show();
-                return true;
-            default:
-                return super.onContextItemSelected(item);
         }
-
-
-    }
-
 
     private void GoHome() {
         Intent MapsActivityIntent = new Intent(getBaseContext(), MapsActivity.class);
