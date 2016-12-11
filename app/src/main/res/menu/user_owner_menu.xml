@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.gammazero.signalrocket.MapsActivity" >
+
+    <item
+        android:id="@+id/member_inactive"
+        android:title="Mark members as inactive" />
+    <item
+        android:id="@+id/member_active"
+        android:title="Mark members as active" />
+    <item
+        android:id="@+id/member_delete"
+        android:title="Delete members" />
+    <item
+        android:id="@+id/go_home"
+        android:title="Home" />
+</menu>

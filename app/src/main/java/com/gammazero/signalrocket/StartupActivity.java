@@ -77,6 +77,7 @@ public class StartupActivity extends Activity {
 
             Intent mapsActivityIntent = new Intent(getApplicationContext(), MapsActivity.class);
             startActivity(mapsActivityIntent);
+            finish();
 
         }
 

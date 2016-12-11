@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
@@ -28,16 +27,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
@@ -56,11 +51,8 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -96,7 +88,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     String myDistInt = "";
     int myMapType = GoogleMap.MAP_TYPE_NORMAL;
     String prefMapType = "";
-    float zoomLevel = 13;
+    float zoomLevel = 13f;
     LatLng latLng = null;
     LocationManager mlocManager;
     LocationListener mlocListener;
@@ -105,12 +97,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     Timer timer = new Timer();
     boolean isTimerRunning;
 
-    float fakeLat;
-
     // ================================================================================================
     int locTimeInterval;
     int locDistanceInterval;
-    private GoogleApiClient client;
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 0;
     public static final int MY_PERMISSIONS_REQUEST_LOCATION_STOP = 1;
     private ClusterManager<MyItem> mClusterManager;
@@ -123,12 +112,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             zoomLevel = mMap.getCameraPosition().zoom;
         } catch (Exception e) {
-            zoomLevel = 13;
+            zoomLevel = 13f;
         }
         if (mCurrentLocation != null) {
             dlatitude = mCurrentLocation.getLatitude();
             dlongitude = mCurrentLocation.getLongitude();
-        };
+        }
         savedInstanceState.putFloat("ZOOMLEVEL", zoomLevel);
         savedInstanceState.putDouble("LATITUDE", dlatitude);
         savedInstanceState.putDouble("LONGITUDE",dlongitude);
@@ -163,7 +152,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         Log.d(TAG, "Starting MapsActivity");
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+       // getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             zoomLevel = extras.getFloat("ZOOMLEVEL");
@@ -202,14 +191,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         myTimeInt = appPrefs.getString("myTimeInterval", "100");
         locTimeInterval = Integer.valueOf(myTimeInt);
         locDistanceInterval = Integer.valueOf(myDistInt);
-        try {
-            String zLevel = appPrefs.getString("zoomLevel", "13");
-            zoomLevel = Float.parseFloat(zLevel);
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
-        }
-        dlatitude = Double.parseDouble(appPrefs.getString("dlatitude", "38.9"));
-        dlongitude = Double.parseDouble(appPrefs.getString("dlongitde", "-77.0"));
+      //  dlatitude = Double.parseDouble(appPrefs.getString("dlatitude", "38.9"));
+      //  dlongitude = Double.parseDouble(appPrefs.getString("dlongitude", "-77.0"));
 
 
 
@@ -289,7 +272,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     } else if (myMapType == GoogleMap.MAP_TYPE_SATELLITE){
                         Log.d(TAG, "map type = MAP_TYPE_SATELLITE");
 
-                     };
+                     }
                     mMap.setMapType(myMapType);
                     mCurrentLocation = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -317,13 +300,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             dlongitude = mCurrentLocation.getLongitude();
         }
         latLng = new LatLng(dlatitude, dlongitude);
-        Log.d(TAG, "Moving map to location " + dlatitude.toString() + " and " +
-                   dlongitude.toString());
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
                // mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 5000, null);
                 Float mapZoom = mMap.getCameraPosition().zoom;
                 String mapZoomString = mapZoom.toString();
-                Log.d(TAG, "Zoom level from extras: " + zoomLevel + "; zoom level from camera = " + mapZoomString);
 
             }
 
@@ -366,6 +346,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
 
+            case R.id.about_screen:
+                setContentView(R.layout.about);
+                return true;
 
             case R.id.preferences_activity:
                 Intent preferencesIntent = new Intent(this, MyPreferencesActivity.class);
@@ -435,7 +418,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return true;
 
             case R.id.main_activity:
-                Intent mainIntent = new Intent(this, MapsActivity.class);
+             //   Intent mainIntent = new Intent(this, MapsActivity.class);
                 latLng = new LatLng(myLatitude, myLongitude);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
@@ -467,6 +450,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             latLng = new LatLng(dlat, dlng);
 
             try {
+
+                zoomLevel = mMap.getCameraPosition().zoom;
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
                 Log.d(TAG, "onLocationChanged: Moved camera to " + latLng.latitude + ", " + latLng.longitude);
             } catch (Exception e) {
@@ -541,7 +526,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Toast.LENGTH_SHORT).show();
 
         }
-        };
+        }
 
     public class PostLocation extends AsyncTask<String, String, String> {
 
@@ -571,7 +556,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder sb = new StringBuilder();
-                    String line = null;
+                    String line = "";
 
                     // Read Server Response
                     while ((line = reader.readLine()) != null) {
@@ -603,7 +588,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder sb = new StringBuilder();
-                    String line = null;
+                    String line = "";
 
                     // Read Server Response
                     while ((line = reader.readLine()) != null) {
@@ -671,10 +656,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                         LatLng memberLatLng = new LatLng(memberDlat, memberDlng);
                         int timeDiff = jObject.getInt("timediff");
-                        // get absolute value in a really cheap and dirty way
-                        if (timeDiff < 0) {
-                            timeDiff = timeDiff * -1;
-                        }
                         // set colors for markers depending on how stale the record is
                         if (timeDiff > 1 && timeDiff < 5) {
                             iconFactory.setColor(Color.YELLOW);
@@ -708,6 +689,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } catch (JSONException e) {
                     Log.e("JSONException", "Error: " + e.toString());
                 }
+            Log.d(TAG, "Exiting loop for PostLocation");
             }
     }
 

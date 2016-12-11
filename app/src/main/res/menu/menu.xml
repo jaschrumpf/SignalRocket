@@ -3,6 +3,10 @@
     tools:context="com.gammazero.signalrocket.MapsActivity" >
 
     <item
+        android:id="@+id/about_screen"
+        android:orderInCategory="10"
+        android:title="About"/>
+    <item
         android:id="@+id/preferences_activity"
         android:orderInCategory="100"
         android:title="@string/preferences_label"/>

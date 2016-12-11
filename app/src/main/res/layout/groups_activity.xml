@@ -23,32 +23,8 @@
         android:textSize="24sp"
         android:layout_weight="0.97"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true">
     </ListView>
-
-
-    <Button
-        android:text="Delete Group"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/button3"
-        android:clickable="true"
-        android:onClick="deleteGroup"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="25dp" />
-
-    <Button
-        android:text="Create Group"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/button2"
-        android:clickable="true"
-        android:onClick="createNewGroup"
-        android:layout_above="@+id/button3"
-        android:layout_alignLeft="@+id/button3"
-        android:layout_alignStart="@+id/button3"
-        android:layout_marginBottom="10dp" />
-
 
 </RelativeLayout>

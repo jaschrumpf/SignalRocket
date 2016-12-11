@@ -6,33 +6,38 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Handler;
+import android.widget.ImageView;
 import android.widget.VideoView;
+
+import java.util.Timer;
 
 
 /**
  * Created by Jamie on 9/15/2016.
  */
-public class SignalRocketIntro extends Activity{
+public class SignalRocketIntro extends Activity {
 
-        /** Called when the activity is first created. */
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+    /**
+     * Called when the activity is first created.
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-            setContentView(R.layout.activity_startup);
+        setContentView(R.layout.logo);
 
-        }
- //           VideoView myVideoView = (VideoView)findViewById(R.id.videoview);
- //           String SrcPath = "android.resource://net.hilltopper.gamewatch/raw/" + R.raw.gamewatch_intro;
-//            myVideoView.setVideoURI(Uri.parse(SrcPath));
-//            myVideoView.requestFocus();
- //           myVideoView.start();
- //           myVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener()  {
-                public void onCompletion(MediaPlayer arg0) {
-                    Intent intent = new Intent(getBaseContext(), MapsActivity.class);
-                    startActivity(intent);
-                    finish();
-//                }
- //           });
-        }
+        ImageView rocketImageView = (ImageView) findViewById(R.id.logo);
+        rocketImageView.setImageResource(R.drawable.signal_rocket_logo);
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent startupIntent = new Intent(getBaseContext(), StartupActivity.class);
+                startActivity(startupIntent);
+                finish();
+            }
+        }, 3000);
     }
+}

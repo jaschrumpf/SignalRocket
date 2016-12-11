@@ -51,5 +51,11 @@
     <string name="select_time_interval">Select Time Interval (s)</string>
     <string name="time_interval">Time Intervals (s)</string>
     <string name="invitation_activity">Invite someone to join your group</string>
+    <string name="about_text">
+SignalRocket is designed to allow friends and family to locate one another while requiring no personal information whatever.  Your screen and group names can be anything you wish, and SignalRocket will never ask for phone numbers or addresses.
+\n\nI hope you find SignalRocket to be a fun and useful addition to your phone apps.  Comments and suggestions are welcome, and can be sent to stonesoupdev@gmail.com.
+\n\nThank you for using SignalRocket.
+\n\nJames Schrumpf
+    </string>
 
 </resources>

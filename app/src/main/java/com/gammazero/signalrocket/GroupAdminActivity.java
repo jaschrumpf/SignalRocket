@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -44,11 +45,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.security.acl.Group;
+import java.util.ArrayList;
 
 /**
  * Created by Jamie on 9/21/2016.
  */
-public class GroupAdminActivity extends Activity {
+public class GroupAdminActivity extends AppCompatActivity {
 
     private static final String TAG = "GroupAdminActivity";
     private static final String PREFERENCE_FILE = "com.gammazero.signalrocket.prefs";
@@ -83,6 +85,7 @@ public class GroupAdminActivity extends Activity {
     String newActiveGroupID = "";
     Context context;
     Boolean[] memberChecked = new Boolean[50];
+    String groupList = "";
 
 
     @Override
@@ -205,6 +208,7 @@ public class GroupAdminActivity extends Activity {
                 JSONArray jArray = null;
                 int lengthJsonArr = 0;
 
+
             /*********** Process each JSON Node ************/
 
                 /****** Creates a new JSONObject with name/value mappings from the JSON string. ********/
@@ -278,21 +282,24 @@ public class GroupAdminActivity extends Activity {
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
                     // ListView Clicked item index
-                    int itemPosition = position;
-                    if (memberChecked[itemPosition] == null) {
-                        memberChecked[itemPosition] = true;
-                    } else if (memberChecked[itemPosition] == true) {
-                        memberChecked[itemPosition] = false;
-                    } else if (memberChecked[itemPosition] == false) {
-                        memberChecked[itemPosition] = true;
+                    if (memberChecked[position] == null) {
+                        memberChecked[position] = true;
+                    } else if (memberChecked[position]) {
+                        memberChecked[position] = false;
+                    } else if (!memberChecked[position]) {
+                        memberChecked[position] = true;
                     }
-                    if (memberChecked[itemPosition] == true) {
-                        listView.getChildAt(itemPosition).setBackgroundColor(Color.parseColor("#aaaaaa"));
-                    } else if (memberChecked[itemPosition] == false) {
-                        listView.getChildAt(itemPosition).setBackgroundColor(Color.BLACK);
+                    if (memberChecked[position]) {
+                        groupList = groupList + group_ids[position] + ":" ;
+                        listView.getChildAt(position).setBackgroundColor(Color.parseColor("#aaaaaa"));
+                    } else if (!memberChecked[position]) {
+                        groupList = groupList.replace(group_ids[position], "");
+                        listView.getChildAt(position).setBackgroundColor(Color.TRANSPARENT);
                     }
                     // ListView Clicked item value
-                    final String itemValue = (String) listView.getItemAtPosition(position);
+               //     final String itemValue = (String) listView.getItemAtPosition(position);
+
+
                 }
 
             });
@@ -305,7 +312,7 @@ public class GroupAdminActivity extends Activity {
 
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.my_groups_menu, menu);
+        inflater.inflate(R.menu.group_long_press_menu, menu);
 
     }
 
@@ -314,8 +321,9 @@ public class GroupAdminActivity extends Activity {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int id = (int) info.id;
         final String  groupName    = (String) listView.getItemAtPosition(id);
+        final String groupID = group_ids[id];
         switch (item.getItemId()) {
-            case R.id.list_group:
+            case R.id.list_members:
                 Intent UserAdminIntent = new Intent(getBaseContext(), UserAdminActivity.class);
                 Bundle extras = getIntent().getExtras();
                 UserAdminIntent.putExtra("ZOOMLEVEL", extras.getFloat("ZOOMLEVEL"));
@@ -323,13 +331,14 @@ public class GroupAdminActivity extends Activity {
                 UserAdminIntent.putExtra("LONGITUDE", extras.getDouble("LONGITUDE"));
                 UserAdminIntent.putExtra("GROUP_RELATION", group_relation);
                 UserAdminIntent.putExtra("GROUP_NAME", groupName);
+                UserAdminIntent.putExtra("GROUP_ID", groupID);
                 startActivity(UserAdminIntent);
                 return true;
-            case R.id.make_active_group:
+            case R.id.make_active:
                 prefsEditor.putString("myGroupName", groupName);
-                prefsEditor.putString("myGroupID", (appPrefs.getString(groupName,"")));
+                prefsEditor.putString("myGroupID", groupID);
                 prefsEditor.commit();
-                appPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+             //   appPrefs = PreferenceManager.getDefaultSharedPreferences(this);
                 if (! prefsEditor.commit()) {
                     Toast.makeText(context, "Preference save failed", Toast.LENGTH_LONG).show();
                 }
@@ -339,8 +348,19 @@ public class GroupAdminActivity extends Activity {
                 mainIntent.putExtra("LATITUDE", extras.getDouble("LATITUDE"));
                 mainIntent.putExtra("LONGITUDE", extras.getDouble("LONGITUDE"));
                 startActivity(mainIntent);
+                return true;
 
-                }
+            case R.id.go_home:
+                Intent mapsIntent = new Intent(getBaseContext(), MapsActivity.class);
+                extras = getIntent().getExtras();
+                mapsIntent.putExtra("ZOOMLEVEL", extras.getFloat("ZOOMLEVEL"));
+                mapsIntent.putExtra("LATITUDE", extras.getDouble("LATITUDE"));
+                mapsIntent.putExtra("LONGITUDE", extras.getDouble("LONGITUDE"));
+                startActivity(mapsIntent);
+
+
+
+        }
                 return true;
         }
 
@@ -357,7 +377,12 @@ public class GroupAdminActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu, menu);
+        MenuInflater inflater = getMenuInflater();
+        if (group_relation.equals("OWNER")) {
+            inflater.inflate(R.menu.my_groups_menu, menu);
+        } else {
+            inflater.inflate(R.menu.group_member_menu, menu);
+        }
         return true;
     }
 
@@ -380,60 +405,21 @@ public class GroupAdminActivity extends Activity {
                 startActivity(preferencesIntent);
                 return true;
 
-            case R.id.group_i_own:
-                Intent groupsIntent = new Intent(this, GroupAdminActivity.class);
-                groupsIntent.putExtra("GROUP_TYPE", "myGroups");
-                groupsIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                groupsIntent.putExtra("LATITUDE", dlatitude);
-                groupsIntent.putExtra("LONGITUDE", dlongitude);
-                groupsIntent.putExtra("GROUP_RELATION", "OWNER");
-                startActivity(groupsIntent);
-                return true;
-
-            case R.id.member_group:
-                groupsIntent = new Intent(this, GroupAdminActivity.class);
-                groupsIntent.putExtra("GROUP_TYPE", "memberGroups");
-                groupsIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                groupsIntent.putExtra("LATITUDE", dlatitude);
-                groupsIntent.putExtra("LONGITUDE", dlongitude);
-                groupsIntent.putExtra("GROUP_RELATION", "MEMBER");
-                startActivity(groupsIntent);
-                return true;
-
-            case R.id.send_to_group:
-                Intent messsageIntent = new Intent(this, SendGroupMessageActivity.class);
-                messsageIntent.putExtra("GROUP_TYPE", "sendGroups");
-                messsageIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                messsageIntent.putExtra("LATITUDE", dlatitude);
-                messsageIntent.putExtra("LONGITUDE", dlongitude);
-                messsageIntent.putExtra("GROUP_RELATION", "");
-                startActivity(messsageIntent);
-                return true;
-
-            case R.id.send_invitation:
-                Intent invitationIntent = new Intent(this, InvitationActivity.class);
-                invitationIntent.putExtra("REQUEST_TYPE", "SEND");
-                invitationIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                invitationIntent.putExtra("LATITUDE", dlatitude);
-                invitationIntent.putExtra("LONGITUDE", dlongitude);
-                startActivity(invitationIntent);
-                return true;
-
-            case R.id.accept_invitation:
-                Intent acceptIntent = new Intent(this, InvitationActivity.class);
-                acceptIntent.putExtra("REQUEST_TYPE", "RECEIVE");
-                acceptIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                acceptIntent.putExtra("LATITUDE", dlatitude);
-                acceptIntent.putExtra("LONGITUDE", dlongitude);
-                startActivity(acceptIntent);
-                return true;
 
             case R.id.main_activity:
                 Intent mainIntent = new Intent(this, MapsActivity.class);
                 mainIntent.putExtra("ZOOMLEVEL", zoomLevel);
                 mainIntent.putExtra("LATITUDE", dlatitude);
                 mainIntent.putExtra("LONGITUDE", dlongitude);
+                return true;
 
+            case R.id.create_group:
+                new CreateNewGroup().execute(myUserID);
+                return true;
+
+            case R.id.delete_group:
+                deleteGroup(groupList);
+                return true;
 
         }
 
@@ -441,40 +427,29 @@ public class GroupAdminActivity extends Activity {
     }
 
     //==================================================================================================
-
-    public void deleteGroup(View view) {
-
-        Toast.makeText(this, "deleteGroup button pushed",Toast.LENGTH_LONG).show();
-    }
-
-
-    public void createNewGroup(View view) {
-
-        setContentView(R.layout.create_new_group_activity);
-        Button new_group = (Button) findViewById(R.id.new_group_button);
-      //  final EditText my_user_name = (EditText) findViewById(R.id.my_user_name);
-        final EditText my_group_name = (EditText) findViewById(R.id.new_group_name);
-        new_group.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-            //    myUserName = my_user_name.getText().toString();
-                myGroupName = my_group_name.getText().toString();
-                String[] new_member_info = new String[2];
-                new_member_info[0] = myUserID;
-                new_member_info[1] = myGroupName;
-
-                new CreateNewGroup().execute(new_member_info);
-            }
-
-        });
-    }
-    //==================================================================================================
     public class CreateNewGroup extends AsyncTask<String, Void, String[]> {
 
         String response = "";
 
-        @Override
-        protected void onPreExecute() {
+        protected void onPreExecute(final String user_id) {
             super.onPreExecute();
+            setContentView(R.layout.create_new_group_activity);
+            Button new_group = (Button) findViewById(R.id.new_group_button);
+            //  final EditText my_user_name = (EditText) findViewById(R.id.my_user_name);
+            final EditText my_group_name = (EditText) findViewById(R.id.new_group_name);
+            new_group.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    //    myUserName = my_user_name.getText().toString();
+                    String newGroupName = my_group_name.getText().toString();
+                    String[] new_group_info = new String[2];
+                    new_group_info[0] = user_id;
+                    new_group_info[1] = newGroupName;
+
+                    new CreateNewGroup().execute(new_group_info);
+                }
+
+            });
+
             // initialize the dialog
         }
 
@@ -545,6 +520,85 @@ public class GroupAdminActivity extends Activity {
         }
     }
     //==================================================================================================
+    public void deleteGroup(String groupList) {
+
+        if (groupList.equals("")) {
+            Toast.makeText(this, "No groups selected to delete", Toast.LENGTH_LONG).show();
+        } else {
+            new DeleteGroup().execute(groupList);
+        }
+    }
+
+
+    public class DeleteGroup extends AsyncTask<String, Void, String> {
+
+        String response = "";
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // initialize the dialog
+        }
+
+        protected String doInBackground(String... parms) {
+            String result = "";
+            BufferedReader reader;
+            String groupIds= parms[0];
+
+            try {
+                // initialize the dialog
+                String data = "";
+                String groupIDs = URLEncoder.encode(groupIds, "UTF-8");
+
+                URL url = new URL("http://www.sandbistro.com/signalrocket/deleteGroups.php?groupList=" + groupIDs);
+                URLConnection conn = url.openConnection();
+                conn.setDoOutput(true);
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write(data);
+                wr.flush();
+
+                // Get the server response
+
+                reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                // Read Server Response
+                while ((line = reader.readLine()) != null) {
+                    // Append server response in string
+                    sb.append(line + " ");
+                }
+                reader.close();
+                result = sb.toString();
+
+            } catch (Exception ex) {
+                Log.d(TAG, ex.getMessage());
+            }
+
+            return result;
+        }
+
+
+        protected void onPostExecute (String result){
+
+            /*********** Process each JSON Node ************/
+
+
+            if (result.startsWith("Success")) {
+
+                Toast.makeText(getApplicationContext(), "Groups deleted", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Failed to delete groups", Toast.LENGTH_LONG).show();
+            }
+            Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
+            mapsIntent.putExtra("ZOOMLEVEL", zoomLevel);
+            mapsIntent.putExtra("LATITUDE", dlatitude);
+            mapsIntent.putExtra("LONGITUDE", dlongitude);
+
+            startActivity(mapsIntent);
+        }
+    }
+    //==================================================================================================
 
     public class GetGroupId extends AsyncTask<String, Void, String[]> {
 
@@ -560,7 +614,7 @@ public class GroupAdminActivity extends Activity {
             String groupName = parms[1];
 
             try {
-                String myUserName = URLEncoder.encode(parms[0], "UTF-8");
+                String myUserName = URLEncoder.encode(groupName, "UTF-8");
                 url = new URL("http://www.sandbistro.com/signalrocket/getGroupID.php?user_id=" + userID + "&group_name=" + groupName);
             } catch (MalformedURLException e) {
                 Log.d(TAG, e.getMessage());

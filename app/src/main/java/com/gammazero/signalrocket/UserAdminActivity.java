@@ -1,6 +1,5 @@
 package com.gammazero.signalrocket;
 
-import android.app.Activity;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -11,19 +10,20 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.CheckedTextView;
 import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,12 +36,13 @@ import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 
 /**
  * Created by Jamie on 11/25/2016.
  */
 
-public class UserAdminActivity extends Activity{
+public class UserAdminActivity extends AppCompatActivity {
 
     private static final String TAG = "GroupAdminActivity";
     Menu menu;
@@ -65,15 +66,15 @@ public class UserAdminActivity extends Activity{
     String data = "";
     ListView listView;
     String[] values;
-    String[] group_ids;
     String[] member_ids;
-    String groupID = "";
-    String group_type = "";
+    String group_id;
     Float zoomLevel;
     Double dlatitude;
     Double dlongitude;
     Boolean[] memberChecked = new Boolean[50];
     String group_relation = "";
+    String membersList = "";
+    String group_name = "";
 
     @Override
     public void onCreate (Bundle savedInstanceState) {
@@ -83,7 +84,8 @@ public class UserAdminActivity extends Activity{
         appPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefsEditor = appPrefs.edit();
 
-        String group_name = extras.getString("GROUP_NAME");
+        group_name = extras.getString("GROUP_NAME");
+        group_id = extras.getString("GROUP_ID");
         zoomLevel = extras.getFloat("ZOOMLEVEL");
         dlatitude = extras.getDouble("LATITUDE");
         dlongitude = extras.getDouble("LONGITUDE");
@@ -95,17 +97,16 @@ public class UserAdminActivity extends Activity{
             setContentView(R.layout.user_activity_member);
 
         }
-        String group_url = "";
         myUserName = appPrefs.getString("myUserName", "");
         myUserID = appPrefs.getString("myUserID", "");
         myGroupName = appPrefs.getString("myGroupName", "");
         myGroupID = appPrefs.getString("myGroupID", "");
 
-        TextView tv = new TextView(this);
+        TextView tv;
         tv=(TextView)findViewById(R.id.display_group);
         tv.setText("Showing group " + group_name);
 
-        new UserAdminActivity.DownloadTask().execute(group_name);
+        new UserAdminActivity.DownloadTask().execute(group_id);
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -143,12 +144,13 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
 
         URL url = null;
         String Content = "";
-        String group_name = parms[0];
+        String group_id = parms[0];
 
         try {
-            url = new URL("http://www.sandbistro.com/signalrocket/getGroupMembers.php?user_id=" + myUserID + "&group_name=" + group_name );
+            url = new URL("http://www.sandbistro.com/signalrocket/getGroupMembers.php?group_id=" + group_id);
         } catch (MalformedURLException e) {
-            e.printStackTrace();       }
+            e.printStackTrace();
+        }
         BufferedReader reader = null;
 
         try {
@@ -204,7 +206,7 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
             }
             values = new String[lengthJsonArr];
             member_ids = new String[lengthJsonArr];
-            JSONObject jObject = null;
+            JSONObject jObject;
 
             for (int i = 0; i < lengthJsonArr; i++) {
                 /****** Get Object for each JSON node.***********/
@@ -212,13 +214,9 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
                     jObject = jArray.getJSONObject(i);
                     String member_name = jObject.getString("name");
                     String member_id = jObject.getString("id");
+                    String isActive = jObject.getString("active");
                     values[i] = member_name;
                     member_ids[i] = member_id;
-
-
-                } catch (NullPointerException npe) {
-                    Log.e(TAG, npe.getMessage());
-                    GoHome();
 
                 } catch (JSONException e) {
                     Log.e(TAG, e.getMessage());
@@ -228,51 +226,357 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
 
             }
             listView = (ListView) findViewById(R.id.user_list);
-         //   ArrayAdapter adapter = new ArrayAdapter<String>(UserAdminActivity.this, R.layout.user_activity_listview, values);
+            //   ArrayAdapter adapter = new ArrayAdapter<String>(UserAdminActivity.this, R.layout.user_activity_listview, values);
             ArrayAdapter adapter = new ArrayAdapter<String>(getApplication(), R.layout.user_activity_listview, values);
             listView.setAdapter(adapter);
 
 
-            // ListView Item Click Listener
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            if (group_relation.equals("OWNER")) {
+                // ListView Item Click Listener
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View v,
+                                            int position, long id) {
 
-                @Override
-                public void onItemClick(AdapterView<?> parent, View v,
-                                        int position, long id) {
-                    // ListView Clicked item index
-                    int itemPosition = position;
-                    if (memberChecked[itemPosition] == null) {
-                        memberChecked[itemPosition] = true;
-                    } else if (memberChecked[itemPosition] == true) {
-                        memberChecked[itemPosition] = false;
-                    } else if (memberChecked[itemPosition] == false) {
-                        memberChecked[itemPosition] = true;
+                        // ListView Clicked item index
+                        if (memberChecked[position] == null) {
+                            memberChecked[position] = true;
+                        } else if (memberChecked[position]) {
+                            memberChecked[position] = false;
+                        } else if (!memberChecked[position]) {
+                            memberChecked[position] = true;
+                        }
+                        if (memberChecked[position]) {
+                            membersList = membersList + member_ids[position] + ":";
+                            listView.getChildAt(position).setBackgroundColor(Color.parseColor("#aaaaaa"));
+                        } else if (!memberChecked[position]) {
+                            membersList = membersList.replace(member_ids[position], "");
+                            listView.getChildAt(position).setBackgroundColor(Color.TRANSPARENT);
+                        }
+
                     }
-                    if (memberChecked[itemPosition] == true) {
-                        listView.getChildAt(itemPosition).setBackgroundColor(Color.parseColor("#aaaaaa"));
-                    } else if (memberChecked[itemPosition] == false) {
-                        listView.getChildAt(itemPosition).setBackgroundColor(Color.BLACK);
-                    }
-                    // ListView Clicked item value
-                    final String itemValue = (String) listView.getItemAtPosition(position);
 
-                    // Show Alert
-                   // Toast.makeText(getApplicationContext(),
-                     //       "Position :" + itemPosition + "  Group Name : " + itemValue + "  Group ID : " + group_ids[itemPosition], Toast.LENGTH_LONG)
-                     //       .show();
+                });
+            }
+        }
+    }
+}
+    //==================================================================================================
+    public void markMembersInactive(String members) {
 
-                    // new GetMembersTask().execute(group_ids[itemPosition]);
-
-
-                }
-
-            });
+        if (group_relation.equals("OWNER") && members.equals("")) {
+            Toast.makeText(this, "No groups selected to delete", Toast.LENGTH_LONG).show();
+        } else {
+            if (group_relation.equals("MEMBER")) {
+                new MarkInactive().execute(myUserID);
+            } else {
+                new MarkInactive().execute(members);
+            }
         }
     }
 
 
-    private void GoHome() {
+    public class MarkInactive extends AsyncTask<String, Void, String> {
+
+        String response = "";
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // initialize the dialog
+        }
+
+        protected String doInBackground(String... parms) {
+            String result = "";
+            BufferedReader reader;
+            String members= parms[0];
+
+            try {
+                // initialize the dialog
+                String data = "";
+                String groupIDs = URLEncoder.encode(members, "UTF-8");
+
+                URL url = new URL("http://www.sandbistro.com/signalrocket/markMembersInactive.php?group_id=" + group_id + "&memberList=" + members);
+                URLConnection conn = url.openConnection();
+                conn.setDoOutput(true);
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write(data);
+                wr.flush();
+
+                // Get the server response
+
+                reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                // Read Server Response
+                while ((line = reader.readLine()) != null) {
+                    // Append server response in string
+                    sb.append(line + " ");
+                }
+                reader.close();
+                result = sb.toString();
+
+            } catch (Exception ex) {
+                Log.d(TAG, ex.getMessage());
+            }
+
+            return result;
+        }
+
+
+        protected void onPostExecute (String result){
+
+            /*********** Process each JSON Node ************/
+
+
+            if (result.startsWith("Success")) {
+
+                Toast.makeText(getApplicationContext(), "Members marked inactive", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Failed to deactivate members", Toast.LENGTH_LONG).show();
+            }
+            Intent userAdminIntent = new Intent(getApplicationContext(), UserAdminActivity.class);
+            userAdminIntent.putExtra("ZOOMLEVEL", zoomLevel);
+            userAdminIntent.putExtra("LATITUDE", dlatitude);
+            userAdminIntent.putExtra("LONGITUDE", dlongitude);;
+            userAdminIntent.putExtra("GROUP_ID", group_id);
+            userAdminIntent.putExtra("GROUP_NAME", group_name);
+            userAdminIntent.putExtra("GROUP_RELATION", group_relation);
+            startActivity(userAdminIntent);
+
+
+            //      startActivity(mapsIntent);
+        }
+    }
+    //==================================================================================================
+    public void markMembersActive(String members) {
+
+        if (members.equals("")) {
+            Toast.makeText(this, "No members selected", Toast.LENGTH_LONG).show();
+        } else {
+            new MarkActive().execute(members);
+        }
+    }
+
+
+    public class MarkActive extends AsyncTask<String, Void, String> {
+
+        String response = "";
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // initialize the dialog
+        }
+
+        protected String doInBackground(String... parms) {
+            String result = "";
+            BufferedReader reader;
+            String members= parms[0];
+
+            try {
+                // initialize the dialog
+                String data = "";
+                String groupIDs = URLEncoder.encode(members, "UTF-8");
+
+                URL url = new URL("http://www.sandbistro.com/signalrocket/markMembersActive.php?group_id=" + group_id  + "&memberList=" + members);
+                URLConnection conn = url.openConnection();
+                conn.setDoOutput(true);
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write(data);
+                wr.flush();
+
+                // Get the server response
+
+                reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                // Read Server Response
+                while ((line = reader.readLine()) != null) {
+                    // Append server response in string
+                    sb.append(line + " ");
+                }
+                reader.close();
+                result = sb.toString();
+
+            } catch (Exception ex) {
+                Log.d(TAG, ex.getMessage());
+            }
+
+            return result;
+        }
+
+
+        protected void onPostExecute (String result){
+
+            /*********** Process each JSON Node ************/
+
+
+            if (result.startsWith("Success")) {
+
+                Toast.makeText(getApplicationContext(), "Members activated", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Failed to activate members", Toast.LENGTH_LONG).show();
+            }
+            Intent userAdminIntent = new Intent(getApplicationContext(), UserAdminActivity.class);
+            userAdminIntent.putExtra("ZOOMLEVEL", zoomLevel);
+            userAdminIntent.putExtra("LATITUDE", dlatitude);
+            userAdminIntent.putExtra("LONGITUDE", dlongitude);;
+            userAdminIntent.putExtra("GROUP_ID", group_id);
+            userAdminIntent.putExtra("GROUP_NAME", group_name);
+            userAdminIntent.putExtra("GROUP_RELATION", group_relation);
+            startActivity(userAdminIntent);
+
+            //startActivity(mapsIntent);
+        }
+    }
+    //==================================================================================================
+    public void deleteMembers(String members) {
+
+        if (members.equals("")) {
+            Toast.makeText(this, "No members selected", Toast.LENGTH_LONG).show();
+        } else {
+            new DeleteMembers().execute(members);
+        }
+    }
+
+
+    public class DeleteMembers extends AsyncTask<String, Void, String> {
+
+        String response = "";
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // initialize the dialog
+        }
+
+        protected String doInBackground(String... parms) {
+            String result = "";
+            BufferedReader reader;
+            String members= parms[0];
+
+            try {
+                // initialize the dialog
+                String data = "";
+                String groupIDs = URLEncoder.encode(members, "UTF-8");
+
+                URL url = new URL("http://www.sandbistro.com/signalrocket/deleteMembers.php?group_id=" + group_id  + "&memberList=" + members);
+                URLConnection conn = url.openConnection();
+                conn.setDoOutput(true);
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write(data);
+                wr.flush();
+
+                // Get the server response
+
+                reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                // Read Server Response
+                while ((line = reader.readLine()) != null) {
+                    // Append server response in string
+                    sb.append(line + " ");
+                }
+                reader.close();
+                result = sb.toString();
+
+            } catch (Exception ex) {
+                Log.d(TAG, ex.getMessage());
+            }
+
+            return result;
+        }
+
+
+        protected void onPostExecute (String result){
+
+            /*********** Process each JSON Node ************/
+
+
+            if (result.startsWith("Success")) {
+
+                Toast.makeText(getApplicationContext(), "Members deleted", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Failed to delete Members", Toast.LENGTH_LONG).show();
+            }
+            Intent userAdminIntent = new Intent(getApplicationContext(), UserAdminActivity.class);
+            userAdminIntent.putExtra("ZOOMLEVEL", zoomLevel);
+            userAdminIntent.putExtra("LATITUDE", dlatitude);
+            userAdminIntent.putExtra("LONGITUDE", dlongitude);;
+            userAdminIntent.putExtra("GROUP_ID", group_id);
+            userAdminIntent.putExtra("GROUP_NAME", group_name);
+            userAdminIntent.putExtra("GROUP_RELATION", group_relation);
+            startActivity(userAdminIntent);
+
+        }
+    }
+    //==================================================================================================
+    @Override
+        public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        if (group_relation.equals("OWNER")) {
+            getMenuInflater().inflate(R.menu.user_owner_menu, menu);
+        } else {
+            getMenuInflater().inflate(R.menu.user_member_menu, menu);
+
+        }
+        return true;
+    }
+
+
+    private void updateMenuTitles() {
+        MenuItem groupMenuItem = menu.findItem(R.id.current_group);
+        groupMenuItem.setTitle("Current group is " + group_name);
+        groupMenuItem.setEnabled(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId()) {
+
+            case R.id.member_inactive:
+                markMembersInactive(membersList);
+                return true;
+            case R.id.member_active:
+                markMembersActive(membersList);
+                return true;
+
+            case R.id.member_delete:
+                deleteMembers(membersList);
+                return true;
+
+            case R.id.preferences_activity:
+                Intent preferencesIntent = new Intent(this, MyPreferencesActivity.class);
+                preferencesIntent.putExtra("ZOOMLEVEL", zoomLevel);
+                preferencesIntent.putExtra("LATITUDE", dlatitude);
+                preferencesIntent.putExtra("LONGITUDE", dlongitude);
+                startActivity(preferencesIntent);
+                return true;
+
+
+
+
+            case R.id.go_home:
+                Intent MapsActivityIntent = new Intent(getBaseContext(), MapsActivity.class);
+                Bundle extras = getIntent().getExtras();
+                MapsActivityIntent.putExtra("ZOOMLEVEL", extras.getFloat("ZOOMLEVEL"));
+                MapsActivityIntent.putExtra("LATITUDE", extras.getDouble("LATITUDE"));
+                MapsActivityIntent.putExtra("LONGITUDE", extras.getDouble("LONGITUDE"));
+                startActivity(MapsActivityIntent);
+                return true;
+        }
+        return true;
+    }
+
+        private void GoHome() {
         Intent MapsActivityIntent = new Intent(getBaseContext(), MapsActivity.class);
         Bundle extras = getIntent().getExtras();
         MapsActivityIntent.putExtra("ZOOMLEVEL", extras.getFloat("ZOOMLEVEL"));
@@ -283,4 +587,3 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
 
 }
 
-}
