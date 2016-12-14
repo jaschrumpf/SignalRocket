@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,7 +27,7 @@ import java.net.URLEncoder;
  * Created by Jamie on 12/3/2016.
  */
 
-public class SendGroupMessageActivity extends Activity {
+public class SendGroupMessageActivity extends AppCompatActivity {
 
     SharedPreferences appPrefs;
     SharedPreferences.Editor prefsEditor;

@@ -6,9 +6,12 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -27,6 +30,7 @@ public class AppPreferencesFragment extends PreferenceFragment {
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         addPreferencesFromResource(R.xml.fragment_preferences);
         SharedPreferences fragPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.OnSharedPreferenceChangeListener rocketPrefsListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -53,12 +57,15 @@ public class AppPreferencesFragment extends PreferenceFragment {
 
         });
 
+
+
     }
 
     public static class Prefs1Fragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+
 
             // Make sure default values are applied.  In a real app, you would
             // want this in a shared function that is used to retrieve the
@@ -76,5 +83,6 @@ public class AppPreferencesFragment extends PreferenceFragment {
         Toast.makeText(getActivity(), "Preference changed in fregment", Toast.LENGTH_LONG).show();
 
     }
+
 
 }

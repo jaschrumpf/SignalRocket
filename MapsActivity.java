@@ -604,6 +604,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     Toast.makeText(context, "Unable to get location information", Toast.LENGTH_LONG).show();
                     Log.e(TAG, "Exception:" + e.getMessage());
+                    result = "[] ";
                 }
                 return result;
             }
@@ -616,6 +617,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //  mClusterManager = new ClusterManager<MyItem>(context, mMap);
 
                 //parse JSON data
+            if (! myResult.equals("[] ")) {
                 try {
                     JSONArray jArray = new JSONArray(myResult);
                     int arrayLength = jArray.length();
@@ -652,7 +654,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             }
 
                             Log.d(TAG, "memberName = " + memberName + " and memberLat = " + memberLat + " and memberLng = " + memberLng);
-                        //   Toast.makeText(getApplicationContext(), "memberName = " + memberName + " and memberLat = " + memberLat + " and memberLng = " + memberLng, Toast.LENGTH_SHORT).show();
+                            //   Toast.makeText(getApplicationContext(), "memberName = " + memberName + " and memberLat = " + memberLat + " and memberLng = " + memberLng, Toast.LENGTH_SHORT).show();
                         } catch (JSONException e) {
                             message_text = "";
                         }
@@ -681,7 +683,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                startActivity(mapsActivityIntent);
 
 
-
                     appPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     prefsEditor = appPrefs.edit();
                     prefsEditor.putString("zoomLevel", Float.toString(zoomLevel));
@@ -691,8 +692,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } catch (JSONException e) {
                     Log.e("JSONException", "Error: " + e.toString());
                 }
-            Log.d(TAG, "Exiting loop for PostLocation");
             }
+            Log.d(TAG, "Exiting loop for PostLocation");
+        }
     }
 
     private Marker addIcon(IconGenerator iconFactory, CharSequence message_text, LatLng position, String snippet, String text) {

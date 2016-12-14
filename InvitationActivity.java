@@ -17,6 +17,7 @@ import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
@@ -44,7 +45,7 @@ import static android.Manifest.permission.SEND_SMS;
  * Created by Jamie on 11/21/2016.
  */
 
-public class InvitationActivity extends Activity {
+public class InvitationActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 1;
     private Button shareIntent;
