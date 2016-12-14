@@ -4,7 +4,7 @@
 
 
     <EditTextPreference
-        android:title="Change User Name"
+        android:title="Change Your Member Name"
         android:key="myUserName"
         android:id="@+id/new_user_name"
         android:layout_width="match_parent">
