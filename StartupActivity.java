@@ -1,6 +1,5 @@
 package com.gammazero.signalrocket;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,11 +8,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-
-import com.google.android.gms.maps.GoogleMap;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,30 +56,31 @@ public class StartupActivity extends AppCompatActivity {
         myUserName = appPrefs.getString("myUserName", "");
         if (myUserName == "") {
             setContentView(R.layout.activity_startup);
-            Button lets_go = (Button) findViewById(R.id.lets_go);
             final EditText my_user_name = (EditText) findViewById(R.id.my_user_name);
             final EditText my_group_name = (EditText) findViewById(R.id.my_group_name);
-            lets_go.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    myUserName = my_user_name.getText().toString();
-                    myGroupName = my_group_name.getText().toString();
-                    String[] new_member_info = new String[2];
-                    new_member_info[0] = myUserName;
-                    new_member_info[1] = myGroupName;
-
-                    new CreateNewMember().execute(new_member_info);
+            my_group_name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    boolean handled = false;
+                    if (actionId == EditorInfo.IME_ACTION_SEND) {
+                        handled = true;
+                        myUserName = my_user_name.getText().toString();
+                        myGroupName = my_group_name.getText().toString();
+                        String[] new_member_info = new String[2];
+                        new_member_info[0] = myUserName;
+                        new_member_info[1] = myGroupName;
+                        Log.d(TAG, "calling CreateNewMember");
+                        new CreateNewMember().execute(new_member_info);
+                    }
+                    return handled;
                 }
-
             });
-
         } else {
 
+            Log.d(TAG, "Starting MapsActivity");
             Intent mapsActivityIntent = new Intent(getApplicationContext(), MapsActivity.class);
             startActivity(mapsActivityIntent);
             finish();
-
         }
-
     }
     //==================================================================================================
     public class CreateNewMember extends AsyncTask<String, Void, JSONArray> {
@@ -96,6 +95,7 @@ public class StartupActivity extends AppCompatActivity {
             URL url = null;
             JSONArray jsonMainNode = null;
             myGroupName = parms[1];
+            String data = "";
 
             try {
                 String myUserName = URLEncoder.encode(parms[0], "UTF-8");
@@ -174,8 +174,6 @@ public class StartupActivity extends AppCompatActivity {
             }
 
             /******* Fetch node values **********/
-
-
             prefsEditor.putString("myUserName", myUserName);
             prefsEditor.putString("myUserID", user_id);
             prefsEditor.putString("myGroupName", myGroupName);

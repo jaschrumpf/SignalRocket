@@ -191,10 +191,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         myTimeInt = appPrefs.getString("myTimeInterval", "100");
         locTimeInterval = Integer.valueOf(myTimeInt);
         locDistanceInterval = Integer.valueOf(myDistInt);
-      //  dlatitude = Double.parseDouble(appPrefs.getString("dlatitude", "38.9"));
-      //  dlongitude = Double.parseDouble(appPrefs.getString("dlongitude", "-77.0"));
-
-
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -203,14 +199,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
@@ -227,102 +215,101 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         Log.d(TAG, "Entering onMapReady");
-       // Toast.makeText(this, "Entering onMapReady", Toast.LENGTH_SHORT).show();
 
         // set up location manager and listener
         try {
             mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             mlocListener = new RocketLocationListener();
             Log.d(TAG, "Entering permissions section");
-        //    Toast.makeText(this, "Setting LocationManager, entering permssions entry", Toast.LENGTH_SHORT).show();
+            //    Toast.makeText(this, "Setting LocationManager, entering permssions entry", Toast.LENGTH_SHORT).show();
             if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) &&
-                (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED)) {
+                    (ContextCompat.checkSelfPermission(this,
+                            Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED)) {
                 Log.d(TAG, "Asking if explanation is needed");
-                    // Asking user if explanation is needed
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                // Asking user if explanation is needed
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                         Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-                        //Prompt the user once explanation has been shown
-                        Log.d(TAG, "Prompting for permissions");
-                         ActivityCompat.requestPermissions(this,
-                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                             MY_PERMISSIONS_REQUEST_LOCATION);
+                    //Prompt the user once explanation has been shown
+                    Log.d(TAG, "Prompting for permissions");
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            MY_PERMISSIONS_REQUEST_LOCATION);
 
-                    } else {
-                        // No explanation needed, we can request the permission.
-                        Log.d(TAG, "Asking for permissions");
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                MY_PERMISSIONS_REQUEST_LOCATION);
-                    }
                 } else {
+                    // No explanation needed, we can request the permission.
+                    Log.d(TAG, "Asking for permissions");
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            MY_PERMISSIONS_REQUEST_LOCATION);
+                }
+            } else {
+                SetUpManager();
+/*
                 Log.d(TAG, "Permissions not needed");
-               // Toast.makeText(this, "Setting LocationListener", Toast.LENGTH_SHORT).show();
-                            mlocManager.requestLocationUpdates(
-                            LocationManager.GPS_PROVIDER,
-                            Long.parseLong(myTimeInt),
-                            Float.parseFloat(myDistInt),
-                            mlocListener);
+            // Toast.makeText(this, "Setting LocationListener", Toast.LENGTH_SHORT).show();
+                mlocManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    Long.parseLong(myTimeInt),
+                    Float.parseFloat(myDistInt),
+                    mlocListener
+                );
 
-                    if (myMapType == GoogleMap.MAP_TYPE_NORMAL) {
-                        Log.d(TAG, "map type = MAP_TYPE_NORMAL");
+                if (myMapType == GoogleMap.MAP_TYPE_NORMAL) {
+                    Log.d(TAG, "map type = MAP_TYPE_NORMAL");
 
-                    } else if (myMapType == GoogleMap.MAP_TYPE_SATELLITE){
-                        Log.d(TAG, "map type = MAP_TYPE_SATELLITE");
+                } else if (myMapType == GoogleMap.MAP_TYPE_SATELLITE){
+                    Log.d(TAG, "map type = MAP_TYPE_SATELLITE");
 
-                     }
-                    mMap.setMapType(myMapType);
-                    mCurrentLocation = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                 }
+                mMap.setMapType(myMapType);
+                mCurrentLocation = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-        //   ClusterManager mClusterManager = new ClusterManager<MyItem>(this, mMap);
-        //    mMap.setOnCameraIdleListener(mClusterManager);
-        //    mMap.setOnMarkerClickListener(mClusterManager);
+                //   ClusterManager mClusterManager = new ClusterManager<MyItem>(this, mMap);
+                //    mMap.setOnCameraIdleListener(mClusterManager);
+                //    mMap.setOnMarkerClickListener(mClusterManager);
 
-                Log.d(TAG, "Zooming map to level " + zoomLevel);
-       // mMap.animateCamera(CameraUpdateFactory.zoomTo(13.0f));
+                myUserName = appPrefs.getString("myUserName", "");
+                myUserID = appPrefs.getString("myUserID", "");
+                myGroupName = appPrefs.getString("myGroupName", "");
+                myGroupID = appPrefs.getString("myGroupID", "");
+                myTimeInt = appPrefs.getString("myTimeInterval", "30000");
+                myDistInt = appPrefs.getString("myDistanceInterval", "100");
+                locTimeInterval = Integer.valueOf(myTimeInt);
+                locDistanceInterval = Integer.valueOf(myDistInt);
 
-        myUserName = appPrefs.getString("myUserName", "");
-        myUserID = appPrefs.getString("myUserID", "");
-        myGroupName = appPrefs.getString("myGroupName", "");
-        myGroupID = appPrefs.getString("myGroupID", "");
-        myTimeInt = appPrefs.getString("myTimeInterval", "30000");
-        myDistInt = appPrefs.getString("myDistanceInterval", "100");
-        locTimeInterval = Integer.valueOf(myTimeInt);
-        locDistanceInterval = Integer.valueOf(myDistInt);
-
-
-        UiSettings mUiSettings = mMap.getUiSettings();
-        mUiSettings.setZoomControlsEnabled(true);
-        if (mCurrentLocation != null) {
-            dlatitude = mCurrentLocation.getLatitude();
-            dlongitude = mCurrentLocation.getLongitude();
-        }
-        latLng = new LatLng(dlatitude, dlongitude);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
-               // mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 5000, null);
+                UiSettings mUiSettings = mMap.getUiSettings();
+                mUiSettings.setZoomControlsEnabled(true);
+                if (mCurrentLocation != null) {
+                     dlatitude = mCurrentLocation.getLatitude();
+                     dlongitude = mCurrentLocation.getLongitude();
+                }
+                latLng = new LatLng(dlatitude, dlongitude);
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
+                // mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 5000, null);
                 Float mapZoom = mMap.getCameraPosition().zoom;
                 String mapZoomString = mapZoom.toString();
+                if (! isTimerRunning) {
+                    locationInfo[1] = dlatitude.toString();
+                    locationInfo[2] = dlongitude.toString();
 
+                     Log.d(TAG, "Starting timer job");
+                    setRepeatingAsyncTask();
+                } else {
+                    Log.d(TAG, "Timer job already running");
+                }
             }
 
-        } catch (NumberFormatException e) {
-            Toast.makeText(getApplicationContext(), "Unable to set up location manager", Toast.LENGTH_LONG). show();
+            } catch (NumberFormatException e) {
+                Toast.makeText(getApplicationContext(), "Unable to set up location manager", Toast.LENGTH_LONG). show();
+            }
+*/
+            }
+        } catch (Exception e) {
+            Log.i(TAG, "Error setting up location manager");
         }
-
-        if (! isTimerRunning) {
-           locationInfo[1] = dlatitude.toString();
-           locationInfo[2] = dlongitude.toString();
-
-            Log.d(TAG, "Starting timer job");
-            setRepeatingAsyncTask();
-        } else {
-            Log.d(TAG, "Timer job already running");
-        }
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -423,21 +410,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mainIntent.putExtra("LATITUDE", dlatitude);
                 mainIntent.putExtra("LONGITUDE", dlongitude);
                 startActivity(mainIntent);
-
-
-
         }
-
         return true;
     }
     //==================================================================================================
-    public class RocketLocationListener implements LocationListener {
+    private class RocketLocationListener implements LocationListener {
 
         @Override
         public void onLocationChanged(Location location) {
 
-            Log.d(TAG, "onLocationChanged.  New location is " + location.getLatitude() +
-                    ", " + location.getLongitude());
             IconGenerator iconFactory = new IconGenerator(context);
 
             // Getting coordinates of the current location
@@ -454,10 +435,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             try {
 
                 zoomLevel = mMap.getCameraPosition().zoom;
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
-                Log.d(TAG, "onLocationChanged: Moved camera to " + latLng.latitude + ", " + latLng.longitude);
+             //   mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
             } catch (Exception e) {
-                Log.d(TAG, e.getMessage());
                 Toast.makeText(getApplicationContext(), "Unable to move camera", Toast.LENGTH_LONG).show();
             }
             Log.d(TAG, "onLocationChanged.  Location from camera is " + mMap.getCameraPosition().toString());
@@ -475,8 +454,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         ActivityCompat.requestPermissions(myActivity,
                                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                                 MY_PERMISSIONS_REQUEST_LOCATION_STOP);
-
-
                     } else {
                         // No explanation needed, we can request the permission.
                         ActivityCompat.requestPermissions(myActivity,
@@ -492,7 +469,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 new PostLocation().execute(locationInfo);
             }
         }
-
 
     @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -519,7 +495,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         public void onProviderEnabled(String provider) {
             Toast.makeText(getApplicationContext(), "GPS has been enabled.",
                     Toast.LENGTH_SHORT).show();
-
         }
 
         @Override
@@ -528,8 +503,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Toast.LENGTH_SHORT).show();
 
         }
-        }
+        }  // End locaiion listner class
 
+    // Post the current location from the location listener, and also fetch the other member coordinates
     public class PostLocation extends AsyncTask<String, String, String> {
 
         String result;
@@ -543,9 +519,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             String id = params[0];
             String latitude = params[1];
             String longitude = params[2];
-            Log.d(TAG, "longitude = " + longitude + " and latitude = " + latitude);
                 try {
-                    Log.d(TAG, "Calling sendLocation web page");
+                    Log.d(TAG, "Calling sendLocation web page. http://www.sandbistro.com/signalrocket/sendLocation.php?id=" + id + "&latitude=" + latitude + "&longitude=" + longitude);
                     URL url = new URL("http://www.sandbistro.com/signalrocket/sendLocation.php?id=" + id + "&latitude=" + latitude + "&longitude=" + longitude);
                     BufferedReader reader;
 
@@ -567,6 +542,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                     reader.close();
                     Content = sb.toString();
+                    Log.d(TAG, "Content = " + Content);
 
                 } catch (Exception e) {
 
@@ -579,6 +555,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 try {
 
                     URL url = new URL("http://www.sandbistro.com/signalrocket/getAllJson.php?group_id=" + myGroupID + "&my_lat=" + latitude + "&my_lng=" + longitude);
+                    Log.d(TAG, "http://www.sandbistro.com/signalrocket/getAllJson.php?group_id=" + myGroupID + "&my_lat=" + latitude + "&my_lng=" + longitude);
                     BufferedReader reader = null;
 
                     URLConnection conn = url.openConnection();
@@ -599,6 +576,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                     reader.close();
                     result = sb.toString();
+                    Log.d(TAG, "result = " + result);
 
                 } catch (Exception e) {
 
@@ -608,7 +586,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 return result;
             }
-
 
         protected void onPostExecute (String myResult) {
 
@@ -628,7 +605,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
 
                         JSONObject jObject = jArray.getJSONObject(i);
-
+                        // set up all the members' markers
                         String memberName = jObject.getString("name");
                         String memberID = jObject.getString("id");
                         String memberLat = jObject.getString("latitude");
@@ -654,23 +631,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             }
 
                             Log.d(TAG, "memberName = " + memberName + " and memberLat = " + memberLat + " and memberLng = " + memberLng);
-                            //   Toast.makeText(getApplicationContext(), "memberName = " + memberName + " and memberLat = " + memberLat + " and memberLng = " + memberLng, Toast.LENGTH_SHORT).show();
                         } catch (JSONException e) {
-                            message_text = "";
+                            text = "";
                         }
                         LatLng memberLatLng = new LatLng(memberDlat, memberDlng);
                         int timeDiff = jObject.getInt("timediff");
                         // set colors for markers depending on how stale the record is
-                        if (timeDiff > 1 && timeDiff < 5) {
-                            iconFactory.setColor(Color.YELLOW);
-                        } else {
-                            if (timeDiff >= 5) {
-                                iconFactory.setColor(Color.RED);
-                                iconFactory.setTextAppearance(Color.WHITE);
+                        // if time diff > 12 hours, age the marker off entirely
+                        if (timeDiff < 12) {
+                            if (timeDiff > 0 && timeDiff < 4) {
+                                iconFactory.setColor(Color.YELLOW);
+                            } else {
+                                if (timeDiff >= 4) {
+                                    iconFactory.setColor(Color.RED);
+                                    iconFactory.setTextAppearance(Color.WHITE);
+                                }
                             }
-                        }
 
-                        groupMarkers[i] = addIcon(iconFactory, memberName, memberLatLng, snippet, text);
+                            groupMarkers[i] = addIcon(iconFactory, memberName, memberLatLng, snippet, text);
+                        }
                         //MyItem offsetItem = new MyItem(memberDlat, memberDlng);
                         //mClusterManager.addItem(offsetItem);
 
@@ -688,14 +667,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     prefsEditor.putString("zoomLevel", Float.toString(zoomLevel));
                     prefsEditor.commit();
 
-                    //Toast.makeText(getApplicationContext(), "Max distance = " + maxDistance, Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
                     Log.e("JSONException", "Error: " + e.toString());
                 }
             }
-            Log.d(TAG, "Exiting loop for PostLocation");
         }
-    }
+    } // end of PostLocation class
 
     private Marker addIcon(IconGenerator iconFactory, CharSequence message_text, LatLng position, String snippet, String text) {
         MarkerOptions markerOptions = new MarkerOptions().
@@ -719,7 +696,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return ssb;
     }
 
-
     public class MyItem implements ClusterItem {
         private final LatLng mPosition;
 
@@ -733,6 +709,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    // handle permission requests for getting and stopping location requests
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -741,6 +718,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     try {
+                        SetUpManager();
+/*
                         mMap.setMapType(myMapType);
                         mlocManager.requestLocationUpdates(
                                 LocationManager.GPS_PROVIDER,
@@ -748,6 +727,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 Float.parseFloat(myDistInt),
                                 mlocListener);
                         mCurrentLocation = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+  */
                     } catch (SecurityException e) {
                         Toast.makeText(this, "Failed to set location updates", Toast.LENGTH_SHORT).show();
                     }
@@ -779,6 +759,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             // permissions this app might request
         }
     }
+    // set up a repeating task that will update the location even when the location hasn't changed
     private boolean setRepeatingAsyncTask() {
 
         final Handler handler = new Handler();
@@ -791,15 +772,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 handler.post(new Runnable() {
                     public void run() {
                         try {
-                            Log.d(TAG, "Calling PostLocation task from timer: locationInfo[1] = " + locationInfo[1] + " and location[2]" + locationInfo[2]);
-                            new PostLocation().execute(locationInfo);
-                         //   myMapType = appPrefs.getInt("myMapType", GoogleMap.MAP_TYPE_NORMAL);
-                         //   myUserName = appPrefs.getString("myUserName", "");
-                         //   myUserID = appPrefs.getString("myUserID", "");
-                         //   myGroupName = appPrefs.getString("myGroupName", "");
-                         //   myGroupID = appPrefs.getString("myGroupID", "");
-                         //   myTimeInt = appPrefs.getString("myTimeInterval", "30000");
-                         //   myDistInt = appPrefs.getString("myDistanceInterval", "100");
+                            String latitude = locationInfo[1].toString();
+                            Log.d(TAG, "calling postlocation from timer job.  Latitude = " + latitude);
+                            if (locationInfo[1] != null) {
+                                new PostLocation().execute(locationInfo);
+                            }
 
                         } catch (Exception e) {
                             Toast.makeText(context, "Error posting location: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -812,6 +789,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         timer.schedule(task, 0, Integer.parseInt(myTimeInt));
         return isTimerRunning;
     }
+
+    // destroy the repeating task when the app is destroyed
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -824,34 +803,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (SecurityException e) {
             Log.d(TAG, "Exception removing updates: " + e.getMessage());
         }
-
-
     }
 
        public void updatePrefs (SharedPreferences newPrefs) {
 
+            prefMapType = newPrefs.getString("myMapType", "MAP_TYPE_NORMAL");
+            if (prefMapType.equals("MAP_TYPE_NORMAL")) {
+                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            } else if (prefMapType.equals("MAP_TYPE_SATELLITE")) {
+                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+            }
+            myDistInt = newPrefs.getString("myDistanceInterval", "100");
+            locTimeInterval = Integer.valueOf(myTimeInt);
+            myTimeInt = newPrefs.getString("myTimeInterval", "30000");
+            locDistanceInterval = Integer.valueOf(myDistInt);
 
-                    prefMapType = newPrefs.getString("myMapType", "MAP_TYPE_NORMAL");
-                    if (prefMapType.equals("MAP_TYPE_NORMAL")) {
-                        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                    } else if (prefMapType.equals("MAP_TYPE_SATELLITE")) {
-                        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                    }
-                    myDistInt = newPrefs.getString("myDistanceInterval", "100");
-                    locTimeInterval = Integer.valueOf(myTimeInt);
-                    myTimeInt = newPrefs.getString("myTimeInterval", "30000");
-                    locDistanceInterval = Integer.valueOf(myDistInt);
-
-                    try {
-                        mlocManager.requestLocationUpdates(
-                                LocationManager.GPS_PROVIDER,
-                                Long.parseLong(myTimeInt),
-                                Float.parseFloat(myDistInt),
-                                mlocListener);
-                    } catch (SecurityException se) {
-                        Log.d(TAG, "Unable to update location manager");
-                    }
+            try {
+                mlocManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        Long.parseLong(myTimeInt),
+                        Float.parseFloat(myDistInt),
+                        mlocListener);
+            } catch (SecurityException se) {
+                Log.d(TAG, "Unable to update location manager");
+            }
         }
+
+    // calculate the zoom level to get all members on one map
     private float getZoomLevel (String distance) {
 
         Double maxDistance = Double.parseDouble(distance);
@@ -881,6 +859,65 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             zoomLevel = 14.0f;
         }
         return zoomLevel;
+    }
+
+    private void SetUpManager () {
+        Log.d(TAG, "Entering SetUpManager");
+        try {
+                mlocManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        Long.parseLong(myTimeInt),
+                        Float.parseFloat(myDistInt),
+                        mlocListener
+                );
+
+                if (myMapType == GoogleMap.MAP_TYPE_NORMAL) {
+                    Log.d(TAG, "map type = MAP_TYPE_NORMAL");
+
+                } else if (myMapType == GoogleMap.MAP_TYPE_SATELLITE){
+                    Log.d(TAG, "map type = MAP_TYPE_SATELLITE");
+
+                }
+                mMap.setMapType(myMapType);
+                mCurrentLocation = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                //   ClusterManager mClusterManager = new ClusterManager<MyItem>(this, mMap);
+                //    mMap.setOnCameraIdleListener(mClusterManager);
+                //    mMap.setOnMarkerClickListener(mClusterManager);
+
+                myUserName = appPrefs.getString("myUserName", "");
+                myUserID = appPrefs.getString("myUserID", "");
+                myGroupName = appPrefs.getString("myGroupName", "");
+                myGroupID = appPrefs.getString("myGroupID", "");
+                myTimeInt = appPrefs.getString("myTimeInterval", "30000");
+                myDistInt = appPrefs.getString("myDistanceInterval", "100");
+                locTimeInterval = Integer.valueOf(myTimeInt);
+                locDistanceInterval = Integer.valueOf(myDistInt);
+
+                UiSettings mUiSettings = mMap.getUiSettings();
+                mUiSettings.setZoomControlsEnabled(true);
+                if (mCurrentLocation != null) {
+                    dlatitude = mCurrentLocation.getLatitude();
+                    dlongitude = mCurrentLocation.getLongitude();
+                }
+                latLng = new LatLng(dlatitude, dlongitude);
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
+                // mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 5000, null);
+                Float mapZoom = mMap.getCameraPosition().zoom;
+                String mapZoomString = mapZoom.toString();
+                if (! isTimerRunning) {
+                    locationInfo[0] = myUserID;
+                    locationInfo[1] = dlatitude.toString();
+                    locationInfo[2] = dlongitude.toString();
+
+                    Log.d(TAG, "Starting timer job");
+                    setRepeatingAsyncTask();
+                } else {
+                    Log.d(TAG, "Timer job already running");
+                }
+        } catch (SecurityException se) {
+            Toast.makeText(getApplicationContext(), "Unable to set up location manager", Toast.LENGTH_LONG). show();
+        }
     }
 
 }

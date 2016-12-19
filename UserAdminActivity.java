@@ -73,6 +73,7 @@ public class UserAdminActivity extends AppCompatActivity {
     Double dlongitude;
     Boolean[] memberChecked = new Boolean[50];
     String group_relation = "";
+    String group_type = "";
     String membersList = "";
     String group_name = "";
 
@@ -90,6 +91,8 @@ public class UserAdminActivity extends AppCompatActivity {
         dlatitude = extras.getDouble("LATITUDE");
         dlongitude = extras.getDouble("LONGITUDE");
         group_relation = extras.getString("GROUP_RELATION");
+        group_type = extras.getString("GROUP_TYPE");
+
 
         if (group_relation.equals("OWNER")) {
             setContentView(R.layout.user_activity);
@@ -97,6 +100,8 @@ public class UserAdminActivity extends AppCompatActivity {
             setContentView(R.layout.user_activity_member);
 
         }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         myUserName = appPrefs.getString("myUserName", "");
         myUserID = appPrefs.getString("myUserID", "");
         myGroupName = appPrefs.getString("myGroupName", "");
@@ -231,7 +236,6 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
             listView.setAdapter(adapter);
 
 
-            if (group_relation.equals("OWNER")) {
                 // ListView Item Click Listener
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -254,11 +258,8 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
                             membersList = membersList.replace(member_ids[position], "");
                             listView.getChildAt(position).setBackgroundColor(Color.TRANSPARENT);
                         }
-
                     }
-
                 });
-            }
         }
     }
 }
@@ -540,11 +541,23 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        int itemID = item.getItemId();
         switch (item.getItemId()) {
+
+            case 16908332:
+                Intent groupIntent = new Intent(this, GroupAdminActivity.class);
+                groupIntent.putExtra("ZOOMLEVEL", zoomLevel);
+                groupIntent.putExtra("LATITUDE", dlatitude);
+                groupIntent.putExtra("LONGITUDE", dlongitude);
+                groupIntent.putExtra("GROUP_TYPE", group_type);
+                groupIntent.putExtra("GROUP_RELATION", group_relation);
+                startActivity(groupIntent);
+                return true;
 
             case R.id.member_inactive:
                 markMembersInactive(membersList);
                 return true;
+
             case R.id.member_active:
                 markMembersActive(membersList);
                 return true;
@@ -561,8 +574,13 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
                 startActivity(preferencesIntent);
                 return true;
 
+            case R.id.hide_me:
+                doSomethingWithMe("hide",membersList);
+                return true;
 
-
+            case R.id.show_me:
+                doSomethingWithMe("show", membersList);
+                return true;
 
             case R.id.go_home:
                 Intent MapsActivityIntent = new Intent(getBaseContext(), MapsActivity.class);
@@ -575,7 +593,89 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
         }
         return true;
     }
+    //==================================================================================================
+    public void doSomethingWithMe(String action, String members) {
 
+        String[] doList = new String[3];
+        if (members.equals("")) {
+            Toast.makeText(this, "No groups selected", Toast.LENGTH_LONG).show();
+        } else {
+            doList[0] = action;
+            doList[1] = myUserID;
+            doList[2] = members;
+            new DoSomethingWithMe().execute(doList);
+
+        }
+    }
+
+    protected class DoSomethingWithMe extends AsyncTask<String, Void, String> {
+
+        protected String doInBackground(String... parms) {
+            String result = "";
+            BufferedReader reader;
+            String userAction = parms[0];
+            String user_id = parms[1];
+            String memberIds = parms[2];
+
+            try {
+                // initialize the dialog
+                String data = "";
+                String groupIDs = URLEncoder.encode(memberIds, "UTF-8");
+                URL url = null;
+
+                switch (userAction) {
+                    case "hide":
+                        url = new URL("http://www.sandbistro.com/signalrocket/hideFromMembers.php?user_id=" + user_id + "&group_id=" + group_id + "&memberList=" + groupIDs);
+
+                    case "show":
+                        url = new URL("http://www.sandbistro.com/signalrocket/unHideFromMembers.php?user_id=" + user_id + "&memberList=" + groupIDs);
+
+                }
+
+                URLConnection conn = url.openConnection();
+                conn.setDoOutput(true);
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write(data);
+                wr.flush();
+
+                // Get the server response
+
+                reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                // Read Server Response
+                while ((line = reader.readLine()) != null) {
+                    // Append server response in string
+                    sb.append(line + " ");
+                }
+                reader.close();
+                result = sb.toString();
+
+            } catch (Exception ex) {
+                Log.d(TAG, ex.getMessage());
+            }
+
+            return result;
+        }
+
+
+        protected void onPostExecute(String result) {
+
+            if (result.startsWith("Success")) {
+
+                Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Uh-oh, didn't work", Toast.LENGTH_LONG).show();
+            }
+            Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
+            mapsIntent.putExtra("ZOOMLEVEL", zoomLevel);
+            mapsIntent.putExtra("LATITUDE", dlatitude);
+            mapsIntent.putExtra("LONGITUDE", dlongitude);
+
+            startActivity(mapsIntent);
+        }
+    }
         private void GoHome() {
         Intent MapsActivityIntent = new Intent(getBaseContext(), MapsActivity.class);
         Bundle extras = getIntent().getExtras();

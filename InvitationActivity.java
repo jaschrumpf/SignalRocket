@@ -1,10 +1,6 @@
 package com.gammazero.signalrocket;
 
-import android.Manifest.permission;
-import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -14,20 +10,19 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -37,9 +32,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.prefs.Preferences;
-
-import static android.Manifest.permission.SEND_SMS;
 
 /**
  * Created by Jamie on 11/21/2016.
@@ -89,6 +81,8 @@ public class InvitationActivity extends AppCompatActivity {
         } else if (request_type.equals("RECEIVE")) {
 
             setContentView(R.layout.receive_invitation_activity);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
             Button invite = (Button) findViewById(R.id.process_invitation);
             final EditText invitation_code = (EditText) findViewById(R.id.invitation_code);
             invite.setOnClickListener(new View.OnClickListener() {
@@ -198,6 +192,7 @@ public class InvitationActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_CODE);
 
                 setContentView(R.layout.invitation_activity);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
                 phoneNo = (EditText) findViewById(R.id.mobileNumber);
                 phoneNo.setText(number, TextView.BufferType.EDITABLE);
@@ -362,6 +357,25 @@ public class InvitationActivity extends AppCompatActivity {
                 return;
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int itemID = item.getItemId();
+        switch (item.getItemId()) {
+
+            case 16908332:
+                Intent mainIntent = new Intent(this, MapsActivity.class);
+                mainIntent.putExtra("ZOOMLEVEL", zoomLevel);
+                mainIntent.putExtra("LATITUDE", dlatitude);
+                mainIntent.putExtra("LONGITUDE", dlongitude);
+                startActivity(mainIntent);
+                return true;
+        }
+        return true;
     }
 }
 
