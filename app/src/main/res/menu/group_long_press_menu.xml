@@ -4,9 +4,9 @@
 
     <item
         android:id="@+id/list_members"
-        android:title="List members" />
+        android:title="List the members of this group" />
     <item
         android:id="@+id/make_active"
-        android:title="Make group active" />
+        android:title="Make this my displayed group" />
 
 </menu>

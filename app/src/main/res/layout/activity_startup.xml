@@ -70,6 +70,7 @@
         android:id="@+id/my_group_name"
         android:layout_gravity="center_horizontal"
         android:inputType="textCapSentences"
+        android:imeOptions="actionSend"
         android:layout_weight="0.03"/>
 
     <TextView
@@ -86,14 +87,6 @@
         android:layout_height="20dp"
         android:layout_gravity="center_horizontal" />
 
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:key="my_user"
-        android:text="@string/lets_go"
-        android:id="@+id/lets_go"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.03" />
 
 
 </LinearLayout>

@@ -3,9 +3,19 @@
     tools:context="com.gammazero.signalrocket.MapsActivity" >
 
     <item
-        android:id="@+id/preferences_activity"
+        android:id="@+id/hide_me"
         android:orderInCategory="100"
-        android:title="@string/preferences_label"/>
+        android:title="Hide me from these groups"/>
+
+    <item
+        android:id="@+id/show_me"
+        android:orderInCategory="105"
+        android:title="Show me in these groups"/>
+
+    <item
+        android:id="@+id/remove_me"
+        android:orderInCategory="110"
+        android:title="Remove me from these groups"/>
 
     <item
         android:id="@+id/main_activity"

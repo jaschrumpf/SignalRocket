@@ -4,10 +4,10 @@ tools:context="com.gammazero.signalrocket.GroupAdminActivity" >
 
 <item
     android:id="@+id/create_group"
-    android:title="Create group" />
+    android:title="Create a new group" />
 <item
     android:id="@+id/delete_group"
-    android:title="Delete Group" />
+    android:title="Delete the selected groups" />
 
 <item
     android:id="@+id/go_home"

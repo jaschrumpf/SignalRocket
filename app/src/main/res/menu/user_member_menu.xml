@@ -3,15 +3,12 @@
     tools:context="com.gammazero.signalrocket.MapsActivity" >
 
     <item
-        android:id="@+id/member_inactive"
-        android:title="Deactivate me" />
+        android:id="@+id/hide_me_from_member"
+        android:title="Hide me from the selected members" />
     <item
-        android:id="@+id/member_active"
-        android:title="Activate me" />
-    <item
-        android:id="@+id/member_delete"
-        android:title="Delete me" />
-    <item
+        android:id="@+id/unhide_me"
+        android:title="Unhide me" />
+     <item
         android:id="@+id/go_home"
         android:title="Home" />
 </menu>

@@ -4,13 +4,13 @@
 
     <item
         android:id="@+id/member_inactive"
-        android:title="Mark members as inactive" />
+        android:title="Don't show the selected members" />
     <item
         android:id="@+id/member_active"
-        android:title="Mark members as active" />
+        android:title="Show the selected members" />
     <item
         android:id="@+id/member_delete"
-        android:title="Delete members" />
+        android:title="Delete the selected members" />
     <item
         android:id="@+id/go_home"
         android:title="Home" />
