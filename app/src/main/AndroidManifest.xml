@@ -9,19 +9,19 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
-    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<!--     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
     <application
+        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-    android:name="android.support.multidex.MultiDexApplication">
+        android:theme="@style/AppTheme">
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -36,7 +36,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name="com.gammazero.signalrocket.SignalRocketIntro"
+            android:name=".SignalRocketIntro"
             android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,35 +45,44 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.gammazero.signalrocket.StartupActivity"
+            android:name=".StartupActivity"
             android:label="SignalRocket">
         </activity>
         <activity
-            android:name="com.gammazero.signalrocket.MapsActivity"
+            android:name=".MapsActivity"
             android:label="SignalRocket">
+
         </activity>
         <activity
-            android:name="com.gammazero.signalrocket.MyPreferencesActivity"
-            android:label="Settings">
+            android:name=".MyPreferencesActivity"
+            android:label="Settings"
+            android:theme="@style/PreferenceScreen">
+
         </activity>
         <activity
-            android:name="com.gammazero.signalrocket.InvitationActivity"
+            android:name=".InvitationActivity"
             android:label="Invitations">
+
         </activity>
         <activity
-            android:name="com.gammazero.signalrocket.GroupAdminActivity"
+            android:name=".GroupAdminActivity"
             android:label="Groups">
+
         </activity>
         <activity
-            android:name="com.gammazero.signalrocket.UserAdminActivity"
+            android:name=".UserAdminActivity"
             android:label="Members">
+
         </activity>
         <activity
-            android:name="com.gammazero.signalrocket.SendGroupMessageActivity"
+            android:name=".SendGroupMessageActivity"
             android:label="Send Message">
+
         </activity>
-        <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
-     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+        <!--
+     ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
+        -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

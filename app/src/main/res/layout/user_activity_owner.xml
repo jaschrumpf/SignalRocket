@@ -6,12 +6,22 @@
     tools:context=".UserAdminActivity"
     android:weightSum="1">
 
-    <TextView
-        android:text="Showing group"
-        android:hint="Tap name to select"
-        android:textSize="16sp"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/rocket_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/RocketOrange"
+        android:elevation="4dp"/>
+
+    <TextView
+        android:text=""
+        android:layout_below="@id/rocket_toolbar"
+        android:hint=""
+        android:textSize="20sp"
+        android:background="@color/LtGray"
+        android:layout_width="match_parent"
+        android:paddingLeft="20dp"
+        android:layout_height="?attr/actionBarSize"
         android:id="@+id/display_group" />
 
 
@@ -19,13 +29,14 @@
         android:id="@+id/user_list"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:textColor="#000000"
+        android:textColor="@color/Black"
         android:textSize="30sp"
         android:choiceMode="multipleChoice"
-        android:layout_weight="0.98"
+        android:divider="@color/RocketBlue"
+        android:dividerHeight="1dp"
+        android:headerDividersEnabled="true"
+        android:footerDividersEnabled="true"
         android:layout_below="@+id/display_group"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true" />
 
 

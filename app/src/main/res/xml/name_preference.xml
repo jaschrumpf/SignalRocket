@@ -1,0 +1,24 @@
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <EditTextPreference
+        android:title="Change Your Member Name"
+        android:summary="Be who you WANT to be!"
+        android:key="myUserName"
+        android:id="@+id/new_user_name"
+        android:layout_width="match_parent"/>
+
+
+    <ListPreference
+        android:defaultValue="1"
+        android:title="@string/select_map_type"
+       android:id="@+id/new_map_type"
+        android:textColor="@color/Black"
+        android:summary="Switch from road map to satellite and back"
+        android:key="myMapType"
+        android:entries="@array/mapviews"
+        android:entryValues="@array/mapviews_vals" />
+
+
+</PreferenceScreen>

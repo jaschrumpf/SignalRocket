@@ -1,40 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Space
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/rocket_toolbar"
+        android:title="My Groups"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:id="@+id/space" />
-
-    <EditText
-        android:layout_width="400dp"
-        android:layout_height="wrap_content"
-        android:inputType="numberDecimal"
-        android:text=""
-        android:hint="Enter code"
-        android:ems="10"
-        android:layout_marginTop="92dp"
-        android:id="@+id/invitation_code" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_marginTop="142dp"
-        android:layout_height="20dp" />
-
-    <Button
-        android:text="I'm in!"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/process_invitation"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="162dp" />
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/RocketOrange"
+        android:elevation="4dp"/>
 
     <TextView
         android:text="Accept an invitation to join a group by entering the six-digit invitation number on the line below, and then tap &quot;I'm in!&quot;"
         android:layout_width="match_parent"
-        android:layout_height="62dp"
+        android:layout_height="?attr/actionBarSize"
         android:id="@+id/invitation_welcome"
-        android:layout_below="@+id/space" />
+        android:layout_below="@+id/rocket_toolbar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:layout_marginTop="58dp" />
+
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:text=""
+        android:hint="Enter code"
+        android:imeOptions="actionSend"
+        android:ems="10"
+        android:id="@+id/invitation_code"
+        android:layout_below="@+id/invitation_welcome"
+        android:gravity="center_horizontal"/>
 </RelativeLayout>

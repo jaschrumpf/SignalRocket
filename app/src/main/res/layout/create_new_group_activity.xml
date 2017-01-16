@@ -5,27 +5,47 @@
     android:layout_height="match_parent"
     android:weightSum="1">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/rocket_toolbar"
+        android:title="My Groups"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/RocketOrange"
+        android:elevation="4dp"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:id="@+id/crowd_image"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/crowd_300x201"
+        android:layout_below="@id/rocket_toolbar"/>
+
     <TextView
         android:text="Enter a name for your new group."
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="118dp"
         android:id="@+id/new_group"
         android:layout_weight="0.03"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:textSize="12sp" />
+        android:padding="5dp"
+        android:textSize="20sp"
+        android:textColor="@color/White"
+        android:background="@color/RocketBlue"
+        android:layout_below="@+id/rocket_toolbar"
+        android:layout_centerHorizontal="true" />
 
     <EditText
-        android:layout_width="500px"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textCapWords"
         android:imeOptions="actionSend"
+        android:hint="Touch here to enter new group name"
         android:ems="10"
         android:id="@+id/new_group_name"
         android:layout_weight="0.03"
-        android:layout_marginTop="26dp"
-        android:layout_below="@+id/new_group"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/crowd_image"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

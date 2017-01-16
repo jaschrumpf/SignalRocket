@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:defaultValue="1"
+        android:title="@string/select_map_type"
+
+        android:id="@+id/new_map_type"
+        android:textColor="@color/Black"
+        android:key="myMapType"
+        android:entries="@array/mapviews"
+        android:entryValues="@array/mapviews_vals" />
+
+</PreferenceScreen>

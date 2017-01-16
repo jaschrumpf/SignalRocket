@@ -7,6 +7,14 @@
     android:orientation="vertical"
     android:weightSum="1">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/rocket_toolbar"
+        android:title="My Groups"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/RocketOrange"
+        android:elevation="4dp"/>
+
     <Space
         android:layout_width="match_parent"
         android:layout_height="50dp"

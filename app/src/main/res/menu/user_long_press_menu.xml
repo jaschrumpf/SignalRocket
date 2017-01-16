@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.gammazero.signalrocket.GroupAdminActivity" >
+
+    <item
+        android:id="@+id/list_members_groups"
+        android:title="List the groups for this member" />
+</menu>

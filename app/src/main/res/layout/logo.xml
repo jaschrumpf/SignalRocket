@@ -6,13 +6,15 @@
     android:background="@color/RocketBlue">
 
     <ImageView
-        android:layout_width="306dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
         android:id="@+id/logo"
-        android:src="@drawable/signal_rocket_logo"
-        android:layout_marginTop="147dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:background="@color/RocketBlue" />
+        android:src="@drawable/signal_rocket_screen"
+        android:background="@color/Black"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

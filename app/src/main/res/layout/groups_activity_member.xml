@@ -1,26 +1,87 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--  for the fragment
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".GroupAdminActivity"
-    android:weightSum="1">
+    android:orientation="vertical" >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/rocket_toolbar"
+        android:layout_width="match_parent"
+        android:title="Groups I'm In"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"/>
 
     <TextView
-        android:text="Tap group name to select"
+        android:text="Tap group name to select.\nLong press to bring up options menu."
         android:textSize="16sp"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:id="@+id/textView5" />
+        android:paddingLeft="10dp"
+        android:paddingTop="7dp"
+        android:layout_height="?attr/actionBarSize"
+        android:id="@+id/textView5"
+        android:background="#ddd" />
 
-    <ListView
-        android:id="@+id/mobile_list"
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:layout_gravity="top"
+        android:background="#000000" />
+
+    <fragment
+        android:id="@+id/fragment1"
+        android:name="com.gammazero.signalrocket.GroupAdminFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:textSize="30sp"
-        android:choiceMode="singleChoice"
-        android:layout_weight="0.97">
-    </ListView>
-
+        android:layout_height="match_parent"
+        tools:layout="@layout/list_item_entry" />
 
 </LinearLayout>
+-->
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".GroupAdminActivity"
+        android:weightSum="1">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/rocket_toolbar"
+            android:layout_width="match_parent"
+            android:title="Groups I'm In"
+            android:layout_height="?attr/actionBarSize"
+            android:navigationIcon="@drawable/ic_rocket_arrow"
+            android:background="@color/RocketOrange"
+            android:elevation="4dp"/>
+    <!-- android:background="?attr/colorPrimary" -->
+
+        <TextView
+            android:text="Tap group name to select.\nLong press to bring up options menu."
+            android:textSize="16sp"
+            android:layout_width="match_parent"
+            android:paddingTop="10dp"
+            android:paddingLeft="15dp"
+            android:layout_height="?attr/actionBarSize"
+            android:id="@+id/textView5"
+            android:background="@color/LtGray" />
+
+        <ListView
+            android:id="@+id/mobile_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="16sp"
+            android:divider="@color/RocketBlue"
+            android:dividerHeight="1dp"
+            android:headerDividersEnabled="true"
+            android:choiceMode="singleChoice"
+            android:footerDividersEnabled="true">
+        </ListView>
+
+
+    </LinearLayout>

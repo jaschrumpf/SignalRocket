@@ -6,19 +6,33 @@
     tools:context=".UserAdminActivity"
     android:weightSum="1">
 
-    <TextView
-        android:text="Showing group"
-        android:hint="owned by "
-        android:textSize="16sp"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/rocket_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/RocketOrange"
+        android:elevation="4dp"/>
+
+    <TextView
+        android:text=""
+        android:hint=""
+        android:textSize="20sp"
+        android:paddingLeft="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/LtGray"
         android:id="@+id/display_group" />
 
     <ListView
         android:id="@+id/user_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
+        android:textColor="@color/Black"
         android:textSize="30sp"
-        android:layout_weight="1.02" />
+        android:choiceMode="multipleChoice"
+        android:divider="@color/RocketBlue"
+        android:dividerHeight="1dp"
+        android:headerDividersEnabled="true"
+        android:footerDividersEnabled="true"  />
 
 </LinearLayout>

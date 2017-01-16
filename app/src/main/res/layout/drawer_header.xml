@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/header_layout"
+    android:layout_width="300dp"
+    android:layout_height="225dp"
+    android:background="@drawable/signalrocket_4_3"
+    android:padding="16dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:orientation="vertical"
+    android:gravity="bottom">
+
+
+    <TextView
+         android:id="@+id/name"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginLeft="16dp"
+         android:layout_marginBottom="90dp"
+         android:textColor="#ffffff"
+         android:text="SignalRocket"
+         android:textSize="28sp"
+         android:textStyle="bold"/>
+
+    <TextView
+    android:id="@+id/member_name"
+    android:layout_width="match_parent"
+    android:layout_height="30dp"
+    android:layout_marginLeft="14dp"
+    android:layout_marginBottom="5dp"
+    android:textColor="#ffffff"
+    android:text="Jamie"
+    android:textSize="24sp"
+    android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/group_name"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_marginLeft="14dp"
+        android:layout_marginBottom="15dp"
+        android:textColor="#ffffff"
+        android:text="Current group is Family"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+
+    />
+    </LinearLayout>

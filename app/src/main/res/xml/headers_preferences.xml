@@ -4,11 +4,11 @@
 
     <header
         android:fragment="com.gammazero.signalrocket.AppPreferencesFragment"
-        android:title="Change Preferences"
-        android:summary="Change your screen name, switch between satellite maps or street view, etc."/>
-    <header
+        android:title="Change your name or map type"
+        android:summary="Go incognito for a while, or use a different kind of map."/>
+     <header
         android:fragment="com.gammazero.signalrocket.AppPreferencesFragment$Prefs1Fragment"
-        android:title="Change Location Intervals"
-        android:summary="Change the time or distance between location records."/>
+        android:title="Change the time or distance interval"
+        android:summary="Change the amount of time or distance between your location updates."/>
 
 </preference-headers>

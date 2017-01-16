@@ -2,12 +2,21 @@
     android:id="@+id/linearLayout1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:padding="5dp" >
+    android:orientation="vertical" >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/rocket_toolbar"
+        android:layout_width="match_parent"
+        android:title="Groups I'm In"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/RocketOrange"
+        android:elevation="4dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/rocket_toolbar"
+        android:layout_marginLeft="5dp"
         android:id="@+id/invite_activity_tv1"
         android:text="Phone Number : "
         android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -17,41 +26,39 @@
         android:layout_below="@id/invite_activity_tv1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
         android:hint="Enter phone number"
         android:inputType="phone" >
     </EditText>
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_marginTop="142dp"
-        android:layout_height="20dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/invite_activity_tv2"
         android:layout_below="@id/mobileNumber"
+        android:layout_marginLeft="5dp"
         android:layout_height="wrap_content"
         android:text="Message: "/>
 
-    <EditText
+    <TextView
         android:id="@+id/smsBody"
         android:layout_below="@id/invite_activity_tv2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:textSize="20sp"
         android:gravity="top"
         android:hint="Enter message body"
-        android:inputType="textMultiLine"
         android:lines="7" />
 
     <Button
-       android:id="@+id/send"
-       android:layout_marginTop="45dp"
-       android:layout_width="200dp"
-       android:layout_height="wrap_content"
-       android:layout_weight="5"
-       android:text="Send"
+        android:id="@+id/send"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="5"
+        android:text="Send"
         android:layout_below="@+id/smsBody"
-        android:layout_centerHorizontal="true" />
+        android:layout_toRightOf="@+id/invite_activity_tv2"
+        android:layout_toEndOf="@+id/invite_activity_tv2" />
 
 </RelativeLayout>

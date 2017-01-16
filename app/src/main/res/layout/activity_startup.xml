@@ -13,13 +13,12 @@
         android:layout_gravity="center_horizontal" />
 
     <TextView
-        android:layout_width="295dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/startup_banner"
         android:id="@+id/textView"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.03" />
+        android:layout_gravity="center_horizontal" />
 
     <Space
         android:layout_width="match_parent"
@@ -32,7 +31,7 @@
         android:text="@string/sales_pitch"
         android:id="@+id/textView2"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="0.08" />
+        android:layout_weight="0.37" />
 
     <Space
         android:layout_width="match_parent"
@@ -55,6 +54,7 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="@string/screen_name"
         android:id="@+id/textView3"
+        android:inputType="textCapWords"
         android:layout_gravity="center_horizontal"
         android:layout_weight="0.03" />
 
@@ -69,7 +69,7 @@
         android:key="my_group_name"
         android:id="@+id/my_group_name"
         android:layout_gravity="center_horizontal"
-        android:inputType="textCapSentences"
+        android:inputType="textCapWords"
         android:imeOptions="actionSend"
         android:layout_weight="0.03"/>
 

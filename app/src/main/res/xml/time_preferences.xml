@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <ListPreference
+            android:defaultValue="@string/time_interval_default"
+            android:title="Select Time Interval(s)"
+            android:key="myTimeInterval"
+            android:entries="@array/time_settings"
+            android:entryValues="@array/time_setting_vals" />
+
+
+</PreferenceScreen>

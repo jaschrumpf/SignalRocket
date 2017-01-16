@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/group_feature"
+        android:checkableBehavior="single">
+        <item android:id="@+id/header_groups"
+            android:icon="@drawable/ic_action_group"
+            android:title="My Groups"/>
+    </group>
+
+    <group android:id="@+id/group_member_feature"
+        android:checkableBehavior="single">
+        <item android:id="@+id/header_member_groups"
+            android:icon="@drawable/ic_action_group_member"
+            android:title="Groups I\'m In"/>
+    </group>
+
+    <group android:id="@+id/member_feature"
+            android:checkableBehavior="single">
+        <item android:id="@+id/header_members"
+            android:icon="@drawable/ic_action_member"
+            android:title="Members"/>
+    </group>
+    <group android:id="@+id/invite_feature"
+        android:checkableBehavior="single">
+        <item android:id="@+id/header_invites"
+            android:icon="@drawable/ic_action_mail"
+            android:title="Invite Friends"/>
+    </group>
+    <group android:id="@+id/accept_feature"
+        android:checkableBehavior="single">
+        <item android:id="@+id/header_accepts"
+            android:icon="@drawable/ic_action_unread_mail"
+            android:title="Accept Invitations"/>
+    </group>
+
+    <group android:id="@+id/message_feature"
+        android:checkableBehavior="single">
+        <item android:id="@+id/send_message"
+            android:icon="@drawable/signalrocket"
+            android:title="Send a Message"/>
+    </group>
+
+    <group android:id="@+id/separator"
+           android:checkableBehavior="none">
+        <item android:id="@+id/separator_item"
+            android:title=""/>
+    </group>
+
+</menu>

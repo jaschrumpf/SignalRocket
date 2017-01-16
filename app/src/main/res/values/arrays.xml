@@ -1,4 +1,10 @@
 <resources>
+    <string-array name="drawer_main_menu">
+        <item>Groups</item>
+        <item>Members</item>
+        <item>Show Everybody</item>
+        <item>Home</item>
+    </string-array>
     <string-array name="listArray">
         <item>Headings</item>
         <item>Headings and Details</item>
