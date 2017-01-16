@@ -1,10 +1,15 @@
 package com.gammazero.signalrocket;
 
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -14,11 +19,14 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -43,7 +51,7 @@ public class InvitationActivity extends AppCompatActivity {
     private Button shareIntent;
     private Button send;
     private EditText phoneNo;
-    private EditText messageBody;
+    private TextView messageBody;
     SharedPreferences appPrefs;
     SharedPreferences.Editor prefsEditor;
     String myGroupName;
@@ -81,16 +89,28 @@ public class InvitationActivity extends AppCompatActivity {
         } else if (request_type.equals("RECEIVE")) {
 
             setContentView(R.layout.receive_invitation_activity);
+            Toolbar rocketToolbar = (Toolbar) findViewById(R.id.rocket_toolbar);
+            setSupportActionBar(rocketToolbar);
+            rocketToolbar.setTitleTextColor(Color.WHITE);
+            getSupportActionBar().setTitle("Invitations");
+            //rocketToolbar.setNavigationIcon(R.drawable.ic_drawer);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-            Button invite = (Button) findViewById(R.id.process_invitation);
-            final EditText invitation_code = (EditText) findViewById(R.id.invitation_code);
-            invite.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    String invitation_number = invitation_code.getText().toString();
-                    new ProcessInvitation().execute(invitation_number);
-                }
 
+            final EditText invitation_code = (EditText) findViewById(R.id.invitation_code);
+
+            invitation_code.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    boolean handled = false;
+                    if (actionId == EditorInfo.IME_ACTION_SEND) {
+                        handled = true;
+                        String invitation_number = invitation_code.getText().toString();
+                        String[] new_member_info = new String[2];
+                        new ProcessInvitation().execute(invitation_number);
+                    }
+                    return handled;
+                }
             });
 
         }
@@ -192,50 +212,110 @@ public class InvitationActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_CODE);
 
                 setContentView(R.layout.invitation_activity);
+                Toolbar rocketToolbar = (Toolbar) findViewById(R.id.rocket_toolbar);
+                setSupportActionBar(rocketToolbar);
+                rocketToolbar.setTitleTextColor(Color.WHITE);
+                getSupportActionBar().setTitle("Invitations");
+                //rocketToolbar.setNavigationIcon(R.drawable.ic_drawer);
+                getSupportActionBar().setDisplayShowHomeEnabled(true);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+       //         setContentView(R.layout.invitation_activity);
+                String SENT = "sent";
+                String DELIVERED = "delivered";
+                Intent sentIntent = new Intent(SENT);
+                /*Create Pending Intents*/
+                final PendingIntent sentPI = PendingIntent.getBroadcast(
+                        getApplicationContext(), 0, sentIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+
+                Intent deliveryIntent = new Intent(DELIVERED);
+
+                final PendingIntent deliverPI = PendingIntent.getBroadcast(
+                        getApplicationContext(), 0, deliveryIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+
+                registerReceiver(new BroadcastReceiver() {
+
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        String result = "";
+
+                        switch (getResultCode()) {
+
+                            case Activity.RESULT_OK:
+                                result = "Transmission successful";
+                                break;
+                            case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                                result = "Transmission failed";
+                                break;
+                            case SmsManager.RESULT_ERROR_RADIO_OFF:
+                                result = "Radio off";
+                                break;
+                            case SmsManager.RESULT_ERROR_NULL_PDU:
+                                result = "No PDU defined";
+                                break;
+                            case SmsManager.RESULT_ERROR_NO_SERVICE:
+                                result = "No service";
+                                break;
+                        }
+
+                        Toast.makeText(getApplicationContext(), result,
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                }, new IntentFilter(SENT));
+
+                registerReceiver(new BroadcastReceiver() {
+
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        Toast.makeText(getApplicationContext(), "Deliverd",
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                }, new IntentFilter(DELIVERED));
+
+
 
                 phoneNo = (EditText) findViewById(R.id.mobileNumber);
                 phoneNo.setText(number, TextView.BufferType.EDITABLE);
-                messageBody = (EditText) findViewById(R.id.smsBody);
-                messageBody.setText("Please join my group, \"" + myGroupName + "\", by opening your SignalRocket app and entering the six-digit " +
-                        "number below on the Join A Group page.\n\nYour join code is " + joinCode, TextView.BufferType.EDITABLE);
+                sms = "Please join my group, \"" + myGroupName + "\", by opening SignalRocket and entering the six-digit " +
+                        "number below on the Join A Group page.\n\nYour join code is " + joinCode;
+                messageBody = (TextView) findViewById(R.id.smsBody);
+                messageBody.setText(sms, TextView.BufferType.EDITABLE);
 
                 send = (Button) findViewById(R.id.send);
                 send.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         number = phoneNo.getText().toString();
-                        sms = messageBody.getText().toString();
 
-                        try {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                if (ContextCompat.checkSelfPermission(InvitationActivity.this,
-                                        android.Manifest.permission.SEND_SMS)
-                                        != PackageManager.PERMISSION_GRANTED) {
+                try {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (ContextCompat.checkSelfPermission(InvitationActivity.this,
+                                android.Manifest.permission.SEND_SMS)
+                                != PackageManager.PERMISSION_GRANTED) {
 
-                                    // Asking user if explanation is needed
-                                    if (ActivityCompat.shouldShowRequestPermissionRationale(InvitationActivity.this,
-                                            android.Manifest.permission.SEND_SMS)) {
+                            // Asking user if explanation is needed
+                            if (ActivityCompat.shouldShowRequestPermissionRationale(InvitationActivity.this,
+                                    android.Manifest.permission.SEND_SMS)) {
 
-                                        //Prompt the user once explanation has been shown
-                                        ActivityCompat.requestPermissions(InvitationActivity.this,
-                                                new String[]{android.Manifest.permission.SEND_SMS},
-                                                MY_PERMISSIONS_REQUEST_SMS_SEND);
+                                //Prompt the user once explanation has been shown
+                                ActivityCompat.requestPermissions(InvitationActivity.this,
+                                        new String[]{android.Manifest.permission.SEND_SMS},
+                                        MY_PERMISSIONS_REQUEST_SMS_SEND);
 
 
-                                    } else {
-                                        // No explanation needed, we can request the permission.
-                                        ActivityCompat.requestPermissions(InvitationActivity.this,
-                                                new String[]{android.Manifest.permission.SEND_SMS},
-                                                MY_PERMISSIONS_REQUEST_SMS_SEND);
-                                    }
-                                } else {
-                                    SmsManager smsManager = SmsManager.getDefault();
-                                    smsManager.sendTextMessage(number, null, sms, null, null);
-                                }
                             } else {
-                                SmsManager smsManager = SmsManager.getDefault();
-                                smsManager.sendTextMessage(number, null, sms, null, null);
+                                // No explanation needed, we can request the permission.
+                                ActivityCompat.requestPermissions(InvitationActivity.this,
+                                        new String[]{android.Manifest.permission.SEND_SMS},
+                                        MY_PERMISSIONS_REQUEST_SMS_SEND);
                             }
+                        } else {
+                            SmsManager smsManager = SmsManager.getDefault();
+                            smsManager.sendTextMessage(number, null, sms, null, null);
                             Toast.makeText(getApplicationContext(), "SMS Sent!",
                                     Toast.LENGTH_LONG).show();
                             // return to main activity
@@ -246,12 +326,35 @@ public class InvitationActivity extends AppCompatActivity {
 
                             startActivity(mapsIntent);
 
-                        } catch (Exception e) {
-                            Toast.makeText(getApplicationContext(),
-                                    "SMS failed, please try again later!",
-                                    Toast.LENGTH_LONG).show();
-                            e.printStackTrace();
                         }
+                    } else {
+                           SmsManager smsManager = SmsManager.getDefault();
+                            smsManager.sendTextMessage(number, null, sms, sentPI, deliverPI);
+
+                        Toast.makeText(getApplicationContext(), "SMS Sent!",
+                                Toast.LENGTH_LONG).show();
+                        // return to main activity
+                        Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
+                        mapsIntent.putExtra("ZOOMLEVEL", zoomLevel);
+                        mapsIntent.putExtra("LATITUDE", dlatitude);
+                        mapsIntent.putExtra("LONGITUDE", dlongitude);
+
+                        startActivity(mapsIntent);
+
+                         /*Send SMS*/
+                         //  sendSMS(number, sms);
+                    //    Intent smsIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + number));
+                //        smsIntent.putExtra("sms_body", sms);
+                //        smsIntent.setType("vnd.android-dir/mms-sms");
+                //        startActivity(smsIntent);
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(),
+                            "SMS failed, please try again later!",
+                            Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
                     }
                 });
 
@@ -260,6 +363,8 @@ public class InvitationActivity extends AppCompatActivity {
             }
         }
     }
+
+
 
     public class ProcessInvitation extends AsyncTask<String, Void, String> {
 
@@ -346,6 +451,16 @@ public class InvitationActivity extends AppCompatActivity {
                     try {
                         SmsManager smsManager = SmsManager.getDefault();
                         smsManager.sendTextMessage(number, null, sms, null, null);
+                        Toast.makeText(getApplicationContext(), "SMS Sent!",
+                                Toast.LENGTH_LONG).show();
+                        // return to main activity
+                        Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
+                        mapsIntent.putExtra("ZOOMLEVEL", zoomLevel);
+                        mapsIntent.putExtra("LATITUDE", dlatitude);
+                        mapsIntent.putExtra("LONGITUDE", dlongitude);
+
+                        startActivity(mapsIntent);
+
                     } catch (SecurityException e) {
                         Toast.makeText(this, "Failed to send message", Toast.LENGTH_SHORT).show();
                     }
@@ -376,6 +491,69 @@ public class InvitationActivity extends AppCompatActivity {
                 return true;
         }
         return true;
+    }
+
+    private void sendSMS(String phoneNumber, String message)
+    {
+        String SENT = "SMS_SENT";
+        String DELIVERED = "SMS_DELIVERED";
+
+        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
+                new Intent(SENT), 0);
+
+        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
+                new Intent(DELIVERED), 0);
+
+        //---when the SMS has been sent---
+        registerReceiver(new BroadcastReceiver(){
+            @Override
+            public void onReceive(Context arg0, Intent arg1) {
+                switch (getResultCode())
+                {
+                    case Activity.RESULT_OK:
+                        Toast.makeText(getBaseContext(), "SMS sent",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                        Toast.makeText(getBaseContext(), "Generic failure",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    case SmsManager.RESULT_ERROR_NO_SERVICE:
+                        Toast.makeText(getBaseContext(), "No service",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    case SmsManager.RESULT_ERROR_NULL_PDU:
+                        Toast.makeText(getBaseContext(), "Null PDU",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    case SmsManager.RESULT_ERROR_RADIO_OFF:
+                        Toast.makeText(getBaseContext(), "Radio off",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        }, new IntentFilter(SENT));
+
+        //---when the SMS has been delivered---
+        registerReceiver(new BroadcastReceiver(){
+            @Override
+            public void onReceive(Context arg0, Intent arg1) {
+                switch (getResultCode())
+                {
+                    case Activity.RESULT_OK:
+                        Toast.makeText(getBaseContext(), "SMS delivered",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        Toast.makeText(getBaseContext(), "SMS not delivered",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        }, new IntentFilter(DELIVERED));
+
+        SmsManager sms = SmsManager.getDefault();
+        sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
     }
 }
 

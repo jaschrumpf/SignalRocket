@@ -1,8 +1,6 @@
 package com.gammazero.signalrocket;
 
-import android.app.Activity;
-import android.app.ListActivity;
-import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -10,7 +8,7 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -20,23 +18,23 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,17 +49,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.security.acl.Group;
 import java.util.ArrayList;
 
 /**
  * Created by Jamie on 9/21/2016.
  */
-public class GroupAdminActivity extends AppCompatActivity {
+public class GroupAdminActivity extends AppCompatActivity  {
 
     private static final String TAG = "GroupAdminActivity";
-    private static final String PREFERENCE_FILE = "com.gammazero.signalrocket.prefs";
-    Menu menu;
+    ArrayList<Item> items = new ArrayList<Item>();
+
 
     SimpleCursorAdapter mAdapter;
     static final String[] PROJECTION = new String[]{ContactsContract.Data._ID,
@@ -78,6 +75,7 @@ public class GroupAdminActivity extends AppCompatActivity {
     String myUserName;
     String myGroupID;
     String myGroupName;
+    String memberName;
     String data = "";
     ListView listView;
     String[] values;
@@ -88,16 +86,32 @@ public class GroupAdminActivity extends AppCompatActivity {
     Double dlatitude;
     Double dlongitude;
     String group_relation = "";
-    String newActiveGroup = "";
-    String newActiveGroupID = "";
     Context context;
     Boolean[] memberChecked = new Boolean[50];
     String groupList = "";
+    String memberId;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        final String TAG = "MA/onSaveInstanceState";
+        savedInstanceState.putFloat("ZOOMLEVEL", zoomLevel);
+        savedInstanceState.putDouble("LATITUDE", dlatitude);
+        savedInstanceState.putDouble("LONGITUDE",dlongitude);
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
 
         Log.d(TAG, "Starting GroupAdminActivity");
         context = this;
@@ -105,62 +119,106 @@ public class GroupAdminActivity extends AppCompatActivity {
         prefsEditor = appPrefs.edit();
 
         Bundle extras = getIntent().getExtras();
-        String group_type = extras.getString("GROUP_TYPE");
         zoomLevel = extras.getFloat("ZOOMLEVEL");
         dlatitude = extras.getDouble("LATITUDE");
         dlongitude = extras.getDouble("LONGITUDE");
         group_relation = extras.getString("GROUP_RELATION");
-        if (group_relation.equals("OWNER")) {
-            setContentView(R.layout.groups_activity);
-        } else if (group_relation.equals("MEMBER")) {
-            setContentView(R.layout.groups_activity_member);
-        }
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        memberName = extras.getString("MEMBER_NAME");
+        memberId = extras.getString("MEMBER_ID");
         String group_url = "";
-        Context context = this;
+        String rocketTitle = "";
+        if (group_relation.equals("OWNER")) {
+            setContentView(R.layout.groups_activity_owner);
+            rocketTitle = "My Groups";
+        } else if (group_relation.equals("MEMBER_OWNER")) {
+            setContentView(R.layout.groups_activity_owner);
+            TextView tv2 = (TextView) findViewById(R.id.textView5);
+            tv2.setText("Tap name to select");
+            rocketTitle = memberName + "'s Groups";
+        } else if (group_relation.equals("MEMBER") || (group_relation.equals("ALL_MEMBERS"))) {
+            setContentView(R.layout.groups_activity_member);
+            rocketTitle = "Groups I'm In";
+        }
+
+
+        Toolbar rocketToolbar = (Toolbar) findViewById(R.id.rocket_toolbar);
+        setSupportActionBar(rocketToolbar);
+        rocketToolbar.setTitleTextColor(Color.WHITE);
+        getSupportActionBar().setTitle(rocketTitle);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        rocketToolbar.setNavigationIcon(R.drawable.ic_rocket_arrow);
+
+
+
         myUserName = appPrefs.getString("myUserName", "");
         myUserID = appPrefs.getString("myUserID", "");
         myGroupName = appPrefs.getString("myGroupName", "");
         myGroupID = appPrefs.getString("myGroupID", "");
-        if (group_type.equals("myGroups")) {
+        if (group_relation.equals("OWNER")) {
             group_url = "http://www.sandbistro.com/signalrocket/getOwnedGroups.php?group_owner_id=" + myUserID;
-        } else {
+        } else if (group_relation.equals("MEMBER") || (group_relation.equals("ALL_MEMBERS"))) {
             group_url = "http://www.sandbistro.com/signalrocket/getMemberGroups.php?user_id=" + myUserID;
+        } else if (group_relation.equals("MEMBER_OWNER")) {
+            group_url = "http://www.sandbistro.com/signalrocket/getOwnedGroups.php?group_owner_id=" + memberId;
         }
 
         new DownloadTask().execute(group_url);
+
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("GroupAdmin Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
 
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        // Now create and return a CursorLoader that will take care of
-        // creating a Cursor for the data being displayed.
-        return new CursorLoader(this, ContactsContract.Data.CONTENT_URI,
-                PROJECTION, SELECTION, null, null);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
 
-    // Called when a previously created loader is reset, making the data unavailable
-    public void onLoaderReset(Loader<Cursor> loader) {
-        // This is called when the last Cursor provided to onLoadFinished()
-        // above is about to be closed.  We need to make sure we are no
-        // longer using it.
-        mAdapter.swapCursor(null);
-    }
+    @Override
+    public void onStop() {
+        super.onStop();
 
-
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        // Swap the new cursor in.  (The framework will take care of closing the
-        // old cursor once we return.)
-        mAdapter.swapCursor(data);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
     }
 
     public class DownloadTask extends AsyncTask<String, Void, String> {
+
+        private ProgressDialog dialog = new ProgressDialog(GroupAdminActivity.this);
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             // initialize the dialog
+            dialog = new ProgressDialog(GroupAdminActivity.this,R.style.RocketSpinner);
+            dialog.setCancelable(false);
+            dialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+            dialog.show();
+
         }
 
         @Override
@@ -206,6 +264,14 @@ public class GroupAdminActivity extends AppCompatActivity {
         }
 
         protected void onPostExecute(String userData) {
+
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+
+            prefsEditor.putString("userData", userData);
+            prefsEditor.commit();
+
             //if (!userData.equals("[] ")) {
 
             String group_name = "";
@@ -227,10 +293,12 @@ public class GroupAdminActivity extends AppCompatActivity {
                 lengthJsonArr = jArray.length();
 
                 if (lengthJsonArr == 0) {
+                    Log.d(TAG, "Json array length = 0");
                     GoHome();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
+                Log.d(TAG, "Json exception");
                 GoHome();
             }
             //jsonMainNode = jsonResponse.optJSONArray("AllMyGroups");
@@ -240,6 +308,7 @@ public class GroupAdminActivity extends AppCompatActivity {
             values = new String[lengthJsonArr];
             group_ids = new String[lengthJsonArr];
             JSONObject jObject = null;
+            String saved_owner_id = "";
 
             for (int i = 0; i < lengthJsonArr; i++) {
                 /****** Get Object for each JSON node.***********/
@@ -249,13 +318,21 @@ public class GroupAdminActivity extends AppCompatActivity {
                     group_ids[i] = jObject.getString("id");
                     try {
                         String owner_name = jObject.getString("owner_name");
-                        values[i] = values[i] + "   /   " + owner_name;
-                        prefsEditor.putString(values[i], group_ids[i]);
+                        String owner_id = jObject.getString("owner_id");
+                        if (!owner_id.equals(saved_owner_id)) {
+                            items.add(new SectionItem(owner_name));
+                            saved_owner_id = owner_id;
+                        }
+                        items.add(new EntryItem(values[i], group_ids[i]));
+                        values[i] = owner_name + "\n   " + values[i];
+                       // prefsEditor.putString(values[i], group_ids[i]);
+                        prefsEditor.putString(group_ids[i], values[i]);
                         if (!prefsEditor.commit()) {
                             Toast.makeText(context, "Groups save failed", Toast.LENGTH_LONG).show();
                         }
 
                     } catch (Exception e) {
+                        items.add(new EntryItem(values[i], group_ids[i]));
                         values[i] = values[i];
                         prefsEditor.putString(values[i], group_ids[i]);
                         if (!prefsEditor.commit()) {
@@ -270,135 +347,52 @@ public class GroupAdminActivity extends AppCompatActivity {
 
                 } catch (JSONException e) {
                     Log.e(TAG, e.getMessage());
+                    Log.d(TAG, "Json exception 2");
                     GoHome();
 
                 }
-
             }
-            listView = (ListView) findViewById(R.id.mobile_list);
-            ArrayAdapter adapter = new ArrayAdapter<String>(GroupAdminActivity.this, R.layout.group_activity_listview, values);
+
+            listView = (ListView) findViewById(R.id.mobile_list);  // layout groups_activity_member has this view
+           // ArrayAdapter adapter = new ArrayAdapter<String>(GroupAdminActivity.this, R.layout.group_activity_listview, values);
+            EntryAdapter adapter = new EntryAdapter(GroupAdminActivity.this, items);
+
             listView.setAdapter(adapter);
             registerForContextMenu(listView);
-
-            // ListView Item Click Listener
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
-                    // ListView Clicked item index
-                    if (memberChecked[position] == null) {
-                        memberChecked[position] = true;
-                    } else if (memberChecked[position]) {
-                        memberChecked[position] = false;
-                    } else if (!memberChecked[position]) {
-                        memberChecked[position] = true;
-                    }
-                    if (memberChecked[position]) {
-                        groupList = groupList + group_ids[position] + ":";
-                        listView.getChildAt(position).setBackgroundColor(Color.parseColor("#aaaaaa"));
-                    } else if (!memberChecked[position]) {
-                        groupList = groupList.replace(group_ids[position], "");
-                        listView.getChildAt(position).setBackgroundColor(Color.TRANSPARENT);
-                    }
-                 }
+                EntryItem item = null;
+
+                if(!items.get(position).isSection()){
+
+                    item = (EntryItem)items.get(position);
+                }
+
+                // ListView Clicked item index
+                if (memberChecked[position] == null) {
+                    memberChecked[position] = true;
+                } else if (memberChecked[position]) {
+                    memberChecked[position] = false;
+                } else if (!memberChecked[position]) {
+                    memberChecked[position] = true;
+                }
+                if (memberChecked[position]) {
+                    groupList = groupList + item.subtitle + ":";
+                    listView.getChildAt(position).setBackgroundColor(Color.parseColor("#aaaaaa"));
+                } else if (!memberChecked[position]) {
+                    groupList = groupList.replace(item.subtitle, "");
+                    listView.getChildAt(position).setBackgroundColor(Color.TRANSPARENT);
+                }
+                }
             });
         }
+
     }
 
-    //==================================================================================================
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        MenuInflater inflater = getMenuInflater();
-        if (group_relation.equals("OWNER")) {
-            inflater.inflate(R.menu.my_groups_menu, menu);
-        } else {
-            inflater.inflate(R.menu.group_member_menu, menu);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-//		case R.id.main_activity:
-//			Intent mainIntent = new Intent(this, MainActivity.class);
-//			startActivity(mainIntent);
-//			return true;
-
-            case 16908332:
-                Intent mainIntent = new Intent(this, MapsActivity.class);
-                mainIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                mainIntent.putExtra("LATITUDE", dlatitude);
-                mainIntent.putExtra("LONGITUDE", dlongitude);
-                startActivity(mainIntent);
-                return true;
-
-            case R.id.preferences_activity:
-                Intent preferencesIntent = new Intent(this, MyPreferencesActivity.class);
-                preferencesIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                preferencesIntent.putExtra("LATITUDE", dlatitude);
-                preferencesIntent.putExtra("LONGITUDE", dlongitude);
-                preferencesIntent.putExtra("GROUP_RELATION", group_relation);
-                preferencesIntent.putExtra("GROUP_TYPE", group_type);
-                startActivity(preferencesIntent);
-                return true;
 
 
-            case R.id.main_activity:
-                 mainIntent = new Intent(this, MapsActivity.class);
-                mainIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                mainIntent.putExtra("LATITUDE", dlatitude);
-                mainIntent.putExtra("LONGITUDE", dlongitude);
-                startActivity(mainIntent);
-                return true;
-
-            case R.id.create_group:
-                setContentView(R.layout.create_new_group_activity);
-                // Button new_group = (Button) findViewById(R.id.new_group_button);
-                final EditText new_group_name = (EditText) findViewById(R.id.new_group_name);
-                new_group_name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                        boolean handled = false;
-                        if (actionId == EditorInfo.IME_ACTION_SEND) {
-                            handled = true;
-                            String newGroupName = new_group_name.getText().toString();
-                            String[] new_group_info = new String[2];
-                            new_group_info[0] = myUserID;
-                            new_group_info[1] = newGroupName;
-                            new CreateNewGroup().execute(new_group_info);
-                        }
-                        return handled;
-                    }
-                });
-
-                return true;
-
-
-            case R.id.delete_group:
-                deleteGroup(groupList);
-                return true;
-
-            case R.id.hide_me:
-                doSomethingWithMe("hide",groupList);
-                return true;
-
-            case R.id.show_me:
-                doSomethingWithMe("show", groupList);
-                return true;
-
-            case R.id.remove_me:
-                doSomethingWithMe("remove", groupList);
-                return true;
-
-
-        }
-
-        return true;
-    }
 
     //==================================================================================================
     public class CreateNewGroup extends AsyncTask<String, Void, JSONArray> {
@@ -417,7 +411,7 @@ public class GroupAdminActivity extends AppCompatActivity {
 
             try {
                 String groupName = URLEncoder.encode(parms[1], "UTF-8");
-                url = new URL("http://www.sandbistro.com/signalrocket/createGroup.php?user_id=" + userId + "&group_name=" + groupName);
+                url = new URL("http://www.sandbistro.com/signalrocket/createGroup.php?user_id=" + userId + "&group_name=" + groupName );
             } catch (MalformedURLException e) {
                 Log.d(TAG, e.getMessage());
             } catch (UnsupportedEncodingException uee) {
@@ -486,12 +480,14 @@ public class GroupAdminActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "New group created", Toast.LENGTH_LONG).show();
             prefsEditor.putString(new_group_name, new_group_id);
             prefsEditor.commit();
-            Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
-            mapsIntent.putExtra("ZOOMLEVEL", zoomLevel);
-            mapsIntent.putExtra("LATITUDE", dlatitude);
-            mapsIntent.putExtra("LONGITUDE", dlongitude);
+            Intent groupIntent = new Intent(getApplicationContext(), GroupAdminActivity.class);
+            groupIntent.putExtra("ZOOMLEVEL", zoomLevel);
+            groupIntent.putExtra("LATITUDE", dlatitude);
+            groupIntent.putExtra("LONGITUDE", dlongitude);
+            groupIntent.putExtra("GROUP_RELATION", group_relation);
 
-            startActivity(mapsIntent);
+            startActivity(groupIntent);
+            finish();
         }
     }
 
@@ -589,6 +585,7 @@ public class GroupAdminActivity extends AppCompatActivity {
 
         }
     }
+
     protected class DoSomethingWithMe extends AsyncTask<String, Void, String> {
 
         protected String doInBackground(String... parms) {
@@ -607,9 +604,11 @@ public class GroupAdminActivity extends AppCompatActivity {
                 switch (userAction) {
                     case "hide":
                         url = new URL("http://www.sandbistro.com/signalrocket/hideMemberInGroup.php?user_id=" + user_id + "&groupList=" + groupIDs);
+                    break;
 
                     case "show":
                         url = new URL("http://www.sandbistro.com/signalrocket/showMemberInGroup.php?user_id=" + user_id + "&groupList=" + groupIDs);
+                    break;
 
                     case "remove":
                         url = new URL("http://www.sandbistro.com/signalrocket/removeMemberFromGroup.php?user_id=" + user_id + "&groupList=" + groupIDs);
@@ -659,45 +658,55 @@ public class GroupAdminActivity extends AppCompatActivity {
             startActivity(mapsIntent);
         }
     }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.group_long_press_menu, menu);
+        if (! group_relation.equals("MEMBER_OWNER")) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.group_long_press_menu, menu);
+        }
         super.onCreateContextMenu(menu, v, menuInfo);
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            switch (item.getItemId()) {
-                case R.id.list_members:
-                    Intent useAdminIntent = new Intent(this, UserAdminActivity.class);
-                    useAdminIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                    useAdminIntent.putExtra("LATITUDE", dlatitude);
-                    useAdminIntent.putExtra("LONGITUDE", dlongitude);
-                    useAdminIntent.putExtra("GROUP_ID",group_ids[info.position]);
-                    useAdminIntent.putExtra("GROUP_NAME", values[info.position]);
-                    useAdminIntent.putExtra("GROUP_RELATION", group_relation);
-                    useAdminIntent.putExtra("GROUP_TYPE", group_type);
-                    startActivity(useAdminIntent);
-                    finish();
+    public boolean onContextItemSelected(MenuItem mItem) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) mItem.getMenuInfo();
+        EntryItem item = null;
 
-                    return true;
+        if(!items.get(info.position).isSection()){
 
-                case R.id.make_active:
-                    myGroupID = group_ids[info.position];
-                    myGroupName = values[info.position];
-                    Toast.makeText(this, "group id = " + myGroupID + " group name = " + myGroupName,Toast.LENGTH_LONG).show();
-                    prefsEditor.putString("myGroupID", myGroupID);
-                    prefsEditor.putString("myGroupName", myGroupName);
-                    prefsEditor.commit();
-                    GoHome();
-                    return true;
-                default:
-                    return super.onContextItemSelected(item);
-            }
+            item = (EntryItem)items.get(info.position);
         }
+
+
+        switch (mItem.getItemId()) {
+            case R.id.list_members:
+                Intent useAdminIntent = new Intent(this, UserAdminActivity.class);
+                useAdminIntent.putExtra("ZOOMLEVEL", zoomLevel);
+                useAdminIntent.putExtra("LATITUDE", dlatitude);
+                useAdminIntent.putExtra("LONGITUDE", dlongitude);
+                useAdminIntent.putExtra("GROUP_ID", item.subtitle);
+                useAdminIntent.putExtra("GROUP_NAME", item.title);
+                useAdminIntent.putExtra("GROUP_RELATION", group_relation);
+                startActivity(useAdminIntent);
+                finish();
+
+                return true;
+
+            case R.id.make_active:
+                myGroupID = item.subtitle;
+                myGroupName = item.title;
+                Toast.makeText(this, "group id = " + myGroupID + " group name = " + myGroupName, Toast.LENGTH_LONG).show();
+                prefsEditor.putString("myGroupID", myGroupID);
+                prefsEditor.putString("myGroupName", myGroupName);
+                prefsEditor.commit();
+                GoHome();
+                return true;
+            default:
+                return super.onContextItemSelected(mItem);
+        }
+    }
 
     private void GoHome() {
         Intent MapsActivityIntent = new Intent(getBaseContext(), MapsActivity.class);
@@ -706,6 +715,143 @@ public class GroupAdminActivity extends AppCompatActivity {
         MapsActivityIntent.putExtra("LATITUDE", extras.getDouble("LATITUDE"));
         MapsActivityIntent.putExtra("LONGITUDE", extras.getDouble("LONGITUDE"));
         startActivity(MapsActivityIntent);
+    }
+
+    // calculate the zoom level to get all members on one map
+    private float getZoomLevel(String distance) {
+
+        Double maxDistance = Double.parseDouble(distance);
+        if (maxDistance > 3360.0) {
+            zoomLevel = 1.0f;
+        } else if (maxDistance > 1280.0) {
+            zoomLevel = 2.0f;
+        } else if (maxDistance > 640.0) {
+            zoomLevel = 3.0f;
+        } else if (maxDistance > 320.0) {
+            zoomLevel = 4.0f;
+        } else if (maxDistance > 160.0) {
+            zoomLevel = 5.0f;
+        } else if (maxDistance > 80.0) {
+            zoomLevel = 6.0f;
+        } else if (maxDistance > 40.0) {
+            zoomLevel = 7.0f;
+        } else if (maxDistance > 20.0) {
+            zoomLevel = 8.0f;
+        } else if (maxDistance > 10.0) {
+            zoomLevel = 9.0f;
+        } else if (maxDistance > 5.0) {
+            zoomLevel = 10.0f;
+        } else if (maxDistance > 2.5) {
+            zoomLevel = 13.0f;
+        } else if (maxDistance > 1.25) {
+            zoomLevel = 14.0f;
+        }
+        return zoomLevel;
+    }
+
+    //==================================================================================================
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        MenuInflater inflater = getMenuInflater();
+        if (group_relation.equals("OWNER")) {
+            inflater.inflate(R.menu.my_groups_menu, menu);
+        } else {
+            inflater.inflate(R.menu.group_member_menu, menu);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId()) {
+//		case R.id.main_activity:
+//			Intent mainIntent = new Intent(this, MainActivity.class);
+//			startActivity(mainIntent);
+//			return true;
+
+            case 16908332:
+                Intent mainIntent = new Intent(this, MapsActivity.class);
+                mainIntent.putExtra("ZOOMLEVEL", zoomLevel);
+                mainIntent.putExtra("LATITUDE", dlatitude);
+                mainIntent.putExtra("LONGITUDE", dlongitude);
+                startActivity(mainIntent);
+                return true;
+
+            case R.id.preferences_activity:
+                Intent preferencesIntent = new Intent(this, MyPreferencesActivity.class);
+                preferencesIntent.putExtra("ZOOMLEVEL", zoomLevel);
+                preferencesIntent.putExtra("LATITUDE", dlatitude);
+                preferencesIntent.putExtra("LONGITUDE", dlongitude);
+                preferencesIntent.putExtra("GROUP_RELATION", group_relation);
+                preferencesIntent.putExtra("GROUP_TYPE", group_type);
+                startActivity(preferencesIntent);
+                return true;
+
+
+            case R.id.main_activity:
+                mainIntent = new Intent(this, MapsActivity.class);
+                mainIntent.putExtra("ZOOMLEVEL", zoomLevel);
+                mainIntent.putExtra("LATITUDE", dlatitude);
+                mainIntent.putExtra("LONGITUDE", dlongitude);
+                startActivity(mainIntent);
+                return true;
+
+            case R.id.create_group:
+                setContentView(R.layout.create_new_group_activity);
+                Toolbar rocketToolbar = (Toolbar) findViewById(R.id.rocket_toolbar);
+                setSupportActionBar(rocketToolbar);
+                rocketToolbar.setTitleTextColor(Color.WHITE);
+                getSupportActionBar().setDisplayShowHomeEnabled(true);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                rocketToolbar.setNavigationIcon(R.drawable.ic_rocket_arrow);
+
+
+                // Button new_group = (Button) findViewById(R.id.new_group_button);
+                final EditText new_group_name = (EditText) findViewById(R.id.new_group_name);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(new_group_name, InputMethodManager.SHOW_IMPLICIT);
+                new_group_name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                        boolean handled = false;
+                        if (actionId == EditorInfo.IME_ACTION_SEND) {
+                            handled = true;
+                            String newGroupName = new_group_name.getText().toString();
+                            String[] new_group_info = new String[2];
+                            new_group_info[0] = myUserID;
+                            new_group_info[1] = newGroupName;
+                            new CreateNewGroup().execute(new_group_info);
+                        }
+                        return handled;
+                    }
+                });
+
+                return true;
+
+
+            case R.id.delete_group:
+                deleteGroup(groupList);
+                return true;
+
+            case R.id.hide_me:
+                doSomethingWithMe("hide", groupList);
+                return true;
+
+            case R.id.show_me:
+                doSomethingWithMe("show", groupList);
+                return true;
+
+            case R.id.remove_me:
+                doSomethingWithMe("remove", groupList);
+                return true;
+
+
+        }
+
+        return true;
     }
 
 }

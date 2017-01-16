@@ -3,10 +3,12 @@ package com.gammazero.signalrocket;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,6 +61,15 @@ public class SendGroupMessageActivity extends AppCompatActivity {
         dlatitude = extras.getDouble("LATITUDE");
         dlongitude = extras.getDouble("LONGITUDE");
         setContentView(R.layout.send_group_message_activity);
+        Toolbar rocketToolbar = (Toolbar) findViewById(R.id.rocket_toolbar);
+        setSupportActionBar(rocketToolbar);
+        rocketToolbar.setTitleTextColor(Color.WHITE);
+        getSupportActionBar().setTitle("Messages");
+        //rocketToolbar.setNavigationIcon(R.drawable.ic_drawer);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
         Button send_it = (Button) findViewById(R.id.send_it);
         final EditText my_message = (EditText) findViewById(R.id.message_body);
         send_it.setOnClickListener(new View.OnClickListener() {
@@ -143,17 +154,17 @@ public class SendGroupMessageActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu, menu);
-        this.menu = menu;
-        updateMenuTitles();
+//        this.menu = menu;
+ //       updateMenuTitles();
         return true;
     }
-
+/*
     private void updateMenuTitles() {
         MenuItem groupMenuItem = menu.findItem(R.id.current_group);
         groupMenuItem.setTitle("Current group is " + myGroupName);
         groupMenuItem.setEnabled(false);
     }
-
+*/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -168,54 +179,6 @@ public class SendGroupMessageActivity extends AppCompatActivity {
                 preferencesIntent.putExtra("LATITUDE", dlatitude);
                 preferencesIntent.putExtra("LONGITUDE", dlongitude);
                 startActivity(preferencesIntent);
-                return true;
-
-            case R.id.group_i_own:
-                Intent groupsIntent = new Intent(this, GroupAdminActivity.class);
-                groupsIntent.putExtra("GROUP_TYPE", "myGroups");
-                groupsIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                groupsIntent.putExtra("LATITUDE", dlatitude);
-                groupsIntent.putExtra("LONGITUDE", dlongitude);
-                groupsIntent.putExtra("GROUP_RELATION", "OWNER");
-                startActivity(groupsIntent);
-                return true;
-
-            case R.id.member_group:
-                groupsIntent = new Intent(this, GroupAdminActivity.class);
-                groupsIntent.putExtra("GROUP_TYPE", "memberGroups");
-                groupsIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                groupsIntent.putExtra("LATITUDE", dlatitude);
-                groupsIntent.putExtra("LONGITUDE", dlongitude);
-                groupsIntent.putExtra("GROUP_RELATION", "MEMBER");
-                startActivity(groupsIntent);
-                return true;
-
-            case R.id.send_to_group:
-                Intent messsageIntent = new Intent(this, SendGroupMessageActivity.class);
-                messsageIntent.putExtra("GROUP_TYPE", "sendGroups");
-                messsageIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                messsageIntent.putExtra("LATITUDE", dlatitude);
-                messsageIntent.putExtra("LONGITUDE", dlongitude);
-                messsageIntent.putExtra("GROUP_RELATION", "");
-                startActivity(messsageIntent);
-                return true;
-
-            case R.id.send_invitation:
-                Intent invitationIntent = new Intent(this, InvitationActivity.class);
-                invitationIntent.putExtra("REQUEST_TYPE", "SEND");
-                invitationIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                invitationIntent.putExtra("LATITUDE", dlatitude);
-                invitationIntent.putExtra("LONGITUDE", dlongitude);
-                startActivity(invitationIntent);
-                return true;
-
-            case R.id.accept_invitation:
-                Intent acceptIntent = new Intent(this, InvitationActivity.class);
-                acceptIntent.putExtra("REQUEST_TYPE", "RECEIVE");
-                acceptIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                acceptIntent.putExtra("LATITUDE", dlatitude);
-                acceptIntent.putExtra("LONGITUDE", dlongitude);
-                startActivity(acceptIntent);
                 return true;
 
             case R.id.main_activity:

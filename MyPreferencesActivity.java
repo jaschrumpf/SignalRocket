@@ -12,7 +12,13 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
+import android.app.FragmentManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
@@ -35,7 +41,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
-public class MyPreferencesActivity extends PreferenceActivity {
+public class MyPreferencesActivity extends AppCompatPreferenceActivity{
 
     Menu menu;
     String myUserID = "";
@@ -50,31 +56,44 @@ public class MyPreferencesActivity extends PreferenceActivity {
     Double dlongitude;
     final String TAG = "MyPreferencesActivity";
     Context context;
+    private AppCompatDelegate mDelegate;
 
     @Override
-    public void onCreate (Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
-        Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
-        bar.setTitleTextColor(Color.WHITE);
-        Drawable backArrow;
-        bar.setNavigationIcon(R.drawable.ic_white_back_arrow_97dp);
-        root.addView(bar, 0); // insert at top
-        Drawable myArrow = bar.getNavigationIcon();
-        String myArrowText = myArrow.toString();
-       bar.setNavigationOnClickListener(new View.OnClickListener() {
+
+ //       getDelegate().onPostCreate(savedInstanceState);
+ //             Toolbar rocketToolbar = (Toolbar) findViewById(R.id.rocket_toolbar);
+  //            setSupportActionBar(rocketToolbar);
+ //             rocketToolbar.setTitleTextColor(Color.WHITE);
+ //             getSupportActionBar().setTitle("Settings");
+        //rocketToolbar.setNavigationIcon(R.drawable.ic_drawer);
+ //             getSupportActionBar().setDisplayShowHomeEnabled(true);
+//              getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        LinearLayout root = (LinearLayout) findViewById(android.R.id.list).getParent().getParent().getParent();
+        Toolbar rocketToolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
+        rocketToolbar.setTitle("Settings");
+        rocketToolbar.setTitleTextColor(Color.WHITE);
+        rocketToolbar.setNavigationIcon(R.drawable.ic_white_back_arrow_97dp);
+        root.addView(rocketToolbar, 0); // insert at top
+        Drawable myArrow = rocketToolbar.getNavigationIcon();
+        //      String myArrowText = myArrow.toString();
+        rocketToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
 
+        FragmentManager fMgr = getFragmentManager();
         context = this;
         Log.d(TAG, "Starting MyPreferencesActivity");
-        Bundle extras = getIntent().getExtras();
-        String group_type = extras.getString("GROUP_TYPE");
+
+//        String group_type = extras.getString("GROUP_TYPE");
         //  myGroupName = extras.getString("GROUP_NAME");
-        //  myGroupID = extras.getString("GROUP_ID");
+       //  myGroupID = extras.getString("GROUP_ID");
+        Bundle extras = getIntent().getExtras();
         zoomLevel = extras.getFloat("ZOOMLEVEL");
         dlatitude = extras.getDouble("LATITUDE");
         dlongitude = extras.getDouble("LONGITUDE");
@@ -121,7 +140,6 @@ public class MyPreferencesActivity extends PreferenceActivity {
             }
 
         });
-
     }
 
     public void setOnEditorActionListener (TextView.OnEditorActionListener l) {
@@ -130,9 +148,10 @@ public class MyPreferencesActivity extends PreferenceActivity {
     }
 
     @Override
-    public void onBuildHeaders(List<Header> target)
+    public void onBuildHeaders(List<PreferenceActivity.Header> target)
     {
         loadHeadersFromResource(R.xml.headers_preferences, target);
+
     }
 
     @Override
@@ -163,22 +182,6 @@ public class MyPreferencesActivity extends PreferenceActivity {
             case R.id.preferences_activity:
                 Intent preferencesIntent = new Intent(this, MyPreferencesActivity.class);
                 startActivity(preferencesIntent);
-                return true;
-
-            case R.id.group_types:
-                Intent groupsIntent = new Intent(this, GroupAdminActivity.class);
-                groupsIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                groupsIntent.putExtra("LATITUDE", dlatitude);
-                groupsIntent.putExtra("LONGITUDE", dlongitude);
-                startActivity(groupsIntent);
-                return true;
-
-            case R.id.invitation_activity:
-                Intent invitationIntent = new Intent(this, InvitationActivity.class);
-                invitationIntent.putExtra("ZOOMLEVEL", zoomLevel);
-                invitationIntent.putExtra("LATITUDE", dlatitude);
-                invitationIntent.putExtra("LONGITUDE", dlongitude);
-                startActivity(invitationIntent);
                 return true;
 
             case R.id.main_activity:
@@ -246,5 +249,15 @@ public class MyPreferencesActivity extends PreferenceActivity {
             startActivity(mainIntent);
         }
     }
-}
+
+
+    private AppCompatDelegate getDelegate() {
+        if (mDelegate == null) {
+            mDelegate = AppCompatDelegate.create(this, null);
+        }
+        return mDelegate;
+    }
+
+  }
+
 

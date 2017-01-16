@@ -28,7 +28,7 @@ public class SignalRocketIntro extends Activity {
         setContentView(R.layout.logo);
 
         ImageView rocketImageView = (ImageView) findViewById(R.id.logo);
-        rocketImageView.setImageResource(R.drawable.signal_rocket_logo);
+        rocketImageView.setImageResource(R.drawable.signal_rocket_screen);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -38,6 +38,6 @@ public class SignalRocketIntro extends Activity {
                 startActivity(startupIntent);
                 finish();
             }
-        }, 3000);
+        }, 2000);
     }
 }
